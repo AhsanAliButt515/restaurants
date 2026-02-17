@@ -1,50 +1,126 @@
-# Welcome to your Expo app 👋
+# Restaurants App - Setup & Run Guide
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+## Prerequisites
 
-## Get started
+### Required Versions
+- **Node.js**: 18.x or higher (recommended 20.x LTS)
+- **npm**: 9.x or higher
+- **Expo CLI**: 6.x or higher
+- **Android Studio**: Latest (for Android development)
+- **Xcode**: Latest (for iOS development - macOS only)
 
-1. Install dependencies
+### Environment Setup
+1. Install Node.js from [nodejs.org](https://nodejs.org/)
+2. Install Expo CLI: `npm install -g @expo/cli`
+3. Install Expo Go app on your mobile device (for testing)
 
-   ```bash
-   npm install
-   ```
+## Quick Start
 
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
+### 1. Clone & Install Dependencies
 ```bash
-npm run reset-project
+git clone <repository-url>
+cd restaurants
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 2. Environment Configuration
+Create `.env` file in project root:
+```env
+BASE_URL=http://localhost:3000
+GOOGLE_MAPS_API_KEY=your_google_maps_api_key_here
+```
 
-## Learn more
+### 3. Run Development Server
+```bash
+npx expo start
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+### 4. Test on Device
+- **Android**: Scan QR code with Expo Go app
+- **iOS**: Scan QR code with Camera app (iOS 13+)
+- **Web**: Open `http://localhost:8081` in browser
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Platform-Specific Setup
 
-## Join the community
+### Android Development
+1. Install Android Studio
+2. Create Android Virtual Device (AVD)
+3. Start emulator: `npx expo start --android`
+4. Or connect physical device via USB with USB debugging enabled
 
-Join our community of developers creating universal apps.
+### iOS Development (macOS only)
+1. Install Xcode from App Store
+2. Install iOS Simulator
+3. Run: `npx expo start --ios`
+4. Or connect physical iPhone via cable
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Common Issues & Solutions
+
+### Status Bar Not Visible
+If status bar icons don't appear:
+1. Restart emulator/device completely
+2. Check emulator settings: Extended controls → Display → Enable status bar
+3. Run: `adb shell settings put global policy_control null`
+4. Test on physical device
+
+### Metro Bundle Issues
+```bash
+# Clear cache
+npx expo start -c
+
+# Reset node_modules
+rm -rf node_modules package-lock.json
+npm install
+```
+
+### Build Issues
+```bash
+# For Android
+npx expo build:android
+
+# For iOS
+npx expo build:ios
+```
+
+## Project Structure
+```
+src/
+├── api/           # API endpoints and React Query hooks
+├── components/     # Reusable UI components
+├── navigation/     # Navigation configuration
+├── screens/        # App screens
+└── storage/        # Local storage utilities
+
+app/
+├── _layout.tsx    # Root layout with providers
+└── (tabs)/        # Tab navigation
+```
+
+## Deployment
+
+### Development Build
+```bash
+# Android APK
+npx expo build:android --type apk
+
+# iOS IPA
+npx expo build:ios --type archive
+```
+
+### App Store Submission
+1. Create EAS account: `npx expo register`
+2. Configure build profiles in `eas.json`
+3. Submit: `npx expo submit`
+
+## Support
+For issues:
+1. Check [Expo documentation](https://docs.expo.dev/)
+2. Verify environment variables in `.env`
+3. Ensure all dependencies are installed
+4. Test on physical device if emulator fails
+
+## Version Information
+- React Native: 0.74.x (via Expo SDK 50+)
+- Expo SDK: 50.x
+- React: 18.x
+- TypeScript: 5.x

@@ -1,0 +1,411 @@
+import type { Restaurant } from '@/api/restaurants';
+import { useDeleteRestaurantMutation, useRestaurantsQuery } from '@/api/restaurants';
+import { RestaurantCard } from '@/components/RestaurantCard';
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+import { useFavorites } from '@/hooks/useFavorites';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
+import React, { useRef, useState } from 'react';
+import { ActivityIndicator, Alert, Animated, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { RectButton, Swipeable } from 'react-native-gesture-handler';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+const PAGE_SIZE = 10;
+const MAP_CARD_WIDTH = 260;
+const MAP_CARD_MARGIN = 10;
+
+// Exact pin colors: selected = #264BEB, unselected = #8DA0F0
+// Note: On Android the default pin uses only hue, so both may look similar blue.
+const PIN_COLOR_SELECTED = 'blue';
+const PIN_COLOR_UNSELECTED = 'lightblue';
+
+// Dark map style to match the app (background ~#1E242C)
+const DARK_MAP_STYLE = [
+  { elementType: 'geometry', stylers: [{ color: '#1E242C' }] },
+  { elementType: 'labels.text.fill', stylers: [{ color: '#8a8f96' }] },
+  { elementType: 'labels.text.stroke', stylers: [{ color: '#1E242C' }] },
+  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#2E3742' }] },
+  { featureType: 'road', elementType: 'geometry.stroke', stylers: [{ color: '#3E4955' }] },
+  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#20262C' }] },
+  { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#20262C' }] },
+  { featureType: 'administrative', elementType: 'geometry.stroke', stylers: [{ color: '#2E3742' }] },
+];
+
+export default function RestaurantListScreen() {
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  const [page, setPage] = useState(1);
+  const [selectedMarkerId, setSelectedMarkerId] = useState<string | null>(null);
+  const { data, isLoading, error, isFetching } = useRestaurantsQuery(page, PAGE_SIZE);
+  const navigation = useNavigation();
+  const deleteRestaurant = useDeleteRestaurantMutation();
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const mapRef = useRef<MapView | null>(null);
+  const mapCardsScrollRef = useRef<ScrollView | null>(null);
+  const swipeableRefs = useRef<Map<string, Swipeable | null>>(new Map());
+  const total = data?.total ?? 0;
+  const restaurantList = data?.restaurantList ?? [];
+  const totalPages = Math.ceil(total / PAGE_SIZE) || 1;
+  const handleDeleteRestaurant = (item: Restaurant) => {
+    Alert.alert(
+      'Eliminar restaurante',
+      `¿Eliminar "${item.name}"?`,
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Eliminar',
+          style: 'destructive',
+          onPress: () => {
+            swipeableRefs.current.get(item._id)?.close();
+            deleteRestaurant.mutate(item._id);
+          },
+        },
+      ]
+    );
+  };
+
+  const renderRightActions = (_progress: Animated.AnimatedInterpolation<number>, _dragX: Animated.AnimatedInterpolation<number>, item: Restaurant) => (
+    <View style={styles.swipeActionsRow}>
+      <RectButton
+        style={[styles.swipeActionBtn, styles.swipeActionEdit]}
+        onPress={() => {
+          swipeableRefs.current.get(item._id)?.close();
+          (navigation as any).navigate('EditRestaurant', { id: item._id });
+        }}
+      >
+        <Ionicons name="pencil" size={22} color="#fff" />
+        <Text style={styles.swipeActionText}>Editar</Text>
+      </RectButton>
+      <RectButton
+        style={[styles.swipeActionBtn, styles.swipeActionDelete]}
+        onPress={() => handleDeleteRestaurant(item)}
+      >
+        <Ionicons name="trash-outline" size={22} color="#fff" />
+        <Text style={styles.swipeActionText}>Eliminar</Text>
+      </RectButton>
+    </View>
+  );
+  const renderListItem = ({ item }: { item: Restaurant }) => (
+    <Swipeable
+      ref={(ref) => { if (ref) swipeableRefs.current.set(item._id, ref); }}
+      friction={2}
+      rightThreshold={40}
+      overshootRight={false}
+      renderRightActions={(progress, dragX) => renderRightActions(progress, dragX, item)}
+    >
+      <RestaurantCard
+        data={item}
+        isFavorite={isFavorite(item._id)}
+        onToggleFavorite={() => toggleFavorite(item)}
+      />
+    </Swipeable>
+  );
+
+  const handleMapPress = () => setViewMode('map');
+  const handleListPress = () => setViewMode('list');
+  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
+
+  if (isLoading) {
+    return (
+      <ThemedView style={styles.centerContainer}>
+        <ActivityIndicator size="large" color="#264BEB" />
+      </ThemedView>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.centerContainer}>
+          <ThemedText>Error al cargar restaurantes</ThemedText>
+        </View>
+      </View>
+    );
+  }
+
+  const renderPaginationFooter = () => (
+    <View style={styles.pagination}>
+      <ThemedText style={styles.paginationLabel}>
+        Página {page} de {totalPages} {total ? `(${total} restaurantes)` : ''}
+      </ThemedText>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.paginationNumbers}
+      >
+        {pageNumbers.map((num) => {
+          const isActive = page === num;
+          return (
+            <TouchableOpacity
+              key={num}
+              onPress={() => !isFetching && setPage(num)}
+              disabled={isFetching}
+              style={[styles.pageNumTouchable, isActive && styles.pageNumTouchableActive]}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.pageNumText, isActive && styles.pageNumTextActive]}>
+                {num}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
+    </View>
+  );
+
+  return (
+    <ThemedView style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <ThemedText type="title" style={styles.title}>Restaurantes</ThemedText>
+        <View style={styles.headerActions}>
+          <TouchableOpacity style={styles.iconButton} onPress={handleMapPress}>
+            <Ionicons name="map" size={24} color={viewMode === 'map' ? '#000' : '#CCC'} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.iconButton} onPress={handleListPress}>
+            <Ionicons name="list" size={24} color={viewMode === 'list' ? '#000' : '#CCC'} />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Content Area */}
+      <View style={styles.content}>
+        {viewMode === 'list' ? (
+          <FlatList
+            data={restaurantList}
+            keyExtractor={(item) => item._id}
+            renderItem={renderListItem}
+            contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={false}
+            ListFooterComponent={totalPages > 1 ? renderPaginationFooter : null}
+          />
+        ) : (
+          <View style={styles.mapContainer}>
+            <MapView
+              style={StyleSheet.absoluteFill}
+              provider={PROVIDER_GOOGLE}
+              customMapStyle={DARK_MAP_STYLE}
+              showsUserLocation
+              showsMyLocationButton
+              ref={mapRef}
+              initialRegion={{
+                latitude: 40.4168,
+                longitude: -3.7038,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+              }}
+            >
+              {restaurantList.map((restaurant: Restaurant) => {
+                if (!restaurant.latlng || restaurant.latlng.lat === undefined || restaurant.latlng.lng === undefined) return null;
+                const isSelected = selectedMarkerId === restaurant._id;
+                return (
+                  <Marker
+                    key={`${restaurant._id}-${isSelected}`}
+                    coordinate={{
+                      latitude: restaurant.latlng.lat,
+                      longitude: restaurant.latlng.lng,
+                    }}
+                    title={restaurant.name}
+                    description={restaurant.address}
+                    pinColor={isSelected ? PIN_COLOR_SELECTED : PIN_COLOR_UNSELECTED}
+                    onPress={() => {
+                      setSelectedMarkerId(restaurant._id);
+                      const idx = restaurantList.findIndex((r) => r._id === restaurant._id);
+                      if (idx >= 0 && mapCardsScrollRef.current) {
+                        mapCardsScrollRef.current.scrollTo({
+                          x: idx * (MAP_CARD_WIDTH + MAP_CARD_MARGIN),
+                          animated: true,
+                        });
+                      }
+                    }}
+                  />
+                );
+              })}
+            </MapView>
+            {/* Bottom overlay: horizontal scroll of restaurant cards */}
+            {restaurantList.length > 0 && (
+              <View style={styles.mapCardsOverlay} pointerEvents="box-none">
+                <ScrollView
+                  ref={mapCardsScrollRef}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.mapCardsScrollContent}
+                  style={styles.mapCardsScroll}
+                >
+                  {restaurantList.map((restaurant) => {
+                    const hasLocation = restaurant.latlng && restaurant.latlng.lat != null && restaurant.latlng.lng != null;
+                    if (!hasLocation) return null;
+                    const isSelected = selectedMarkerId === restaurant._id;
+                    return (
+                      <View key={restaurant._id} style={styles.mapCardWrap}>
+                        <RestaurantCard
+                          data={restaurant}
+                          hideComments={true}
+                          isFavorite={isFavorite(restaurant._id)}
+                          onToggleFavorite={() => toggleFavorite(restaurant)}
+                          onPress={() => {
+                            setSelectedMarkerId(restaurant._id);
+                            (navigation as any).navigate('RestaurantDetail', { id: restaurant._id });
+                          }}
+                          containerStyle={styles.mapCardContainerOverride}
+                          cardStyle={[styles.mapCardCardOverride, isSelected && styles.mapCardSelected]}
+                        />
+                      </View>
+                    );
+                  })}
+                </ScrollView>
+              </View>
+            )}
+          </View>
+        )}
+      </View>
+    </ThemedView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingHorizontal: 15,
+  },
+  content: {
+    flex: 1,
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  mapCardWrap: {
+    width: MAP_CARD_WIDTH,
+    marginRight: MAP_CARD_MARGIN,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingBottom: 15,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  swipeActionsRow: {
+    flexDirection: 'row',
+    width: 120,
+    marginBottom: 16,
+  },
+  swipeActionWrap: {
+    width: 60,
+  },
+  swipeActionBtn: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+  },
+  swipeActionEdit: {
+    backgroundColor: '#264BEB',
+  },
+  swipeActionDelete: {
+    backgroundColor: '#E53935',
+  },
+  swipeActionText: {
+    color: '#fff',
+    fontSize: 12,
+    marginTop: 4,
+    fontWeight: '600',
+  },
+  mapContainer: {
+    flex: 1,
+    width: '100%',
+    borderRadius: 20,
+    overflow: 'hidden',
+    backgroundColor: '#f5f5f5',
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#eee',
+    minHeight: 300,
+    position: 'relative',
+  },
+  map: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  mapCardsOverlay: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    paddingHorizontal: 12,
+    paddingBottom: 16,
+    paddingTop: 12,
+  },
+  mapCardsScroll: {
+    flexGrow: 0,
+  },
+  mapCardsScrollContent: {
+    paddingRight: 12,
+  },
+  mapCardContainerOverride: {
+    marginBottom: 0,
+  },
+  mapCardCardOverride: {
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  mapCardSelected: {
+    borderColor: '#264BEB',
+    backgroundColor: '#f0f4ff',
+  },
+  iconButton: {
+    marginLeft: 15,
+    padding: 8,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 12,
+  },
+  listContent: {
+    paddingBottom: 30,
+  },
+  pagination: {
+    paddingVertical: 24,
+    paddingHorizontal: 8,
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    marginTop: 8,
+  },
+  paginationLabel: {
+    fontSize: 14,
+    color: '#687076',
+    marginBottom: 16,
+  },
+  paginationNumbers: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  pageNumTouchable: {
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 4,
+  },
+  pageNumTouchableActive: {
+    backgroundColor: '#264BEB',
+    borderRadius: 18,
+  },
+  pageNumText: {
+    fontSize: 15,
+    color: '#333',
+    fontWeight: '500',
+  },
+  pageNumTextActive: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+});

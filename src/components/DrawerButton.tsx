@@ -1,0 +1,41 @@
+import { IconSymbol } from '@/components/ui/icon-symbol';
+import { Colors } from '@/constants/theme';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { DrawerActions, useNavigation } from '@react-navigation/native';
+import React from 'react';
+import { StyleSheet, TouchableOpacity } from 'react-native';
+
+export const DrawerButton = () => {
+  const navigation = useNavigation();
+  const colorScheme = useColorScheme();
+  const theme = Colors[colorScheme ?? 'light'];
+
+  return (
+    <TouchableOpacity
+      style={[styles.button, { backgroundColor: theme.primary }]}
+      onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}
+      activeOpacity={0.7}
+    >
+      <IconSymbol name="plus" size={24} color="#FFFFFF" />
+    </TouchableOpacity>
+  );
+};
+
+const styles = StyleSheet.create({
+  button: {
+    position: 'absolute',
+    bottom: 80,
+    right: 30,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    elevation: 8,
+    zIndex: 999,
+  },
+});
