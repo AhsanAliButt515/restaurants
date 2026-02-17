@@ -23,7 +23,7 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <SafeAreaView style={{ flex: 1 }}>
+          <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
             <RootNavigator />
             <StatusBar style="auto" />
           </SafeAreaView>

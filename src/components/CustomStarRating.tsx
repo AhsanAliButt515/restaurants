@@ -48,7 +48,7 @@ export const CustomStarRating = ({
     );
 
     stars.push(
-      <View key={i} style={{ marginRight: 6 }}>
+      <View key={i} style={{ marginRight: 5 }}>
         {onRatingChange ? (
           <TouchableOpacity onPress={() => onRatingChange(i)} activeOpacity={0.7} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
             {starNode}

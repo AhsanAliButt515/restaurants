@@ -1,4 +1,4 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { HeartIcon, LocationIcon, PeopleIcon } from '@/utils/svgs';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
 import FavoritesScreen from '../screens/favorites/FavoritesScreen';
@@ -13,7 +13,7 @@ export const TabNavigator = () => {
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
-        tabBarActiveTintColor: '#264BEB',
+        tabBarActiveTintColor: '#000',
         tabBarInactiveTintColor: '#999',
       }}
     >
@@ -22,7 +22,7 @@ export const TabNavigator = () => {
         component={RestaurantListScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="location" size={size} color={color} />
+            <LocationIcon width={size} height={size} color={color} />
           ),
         }}
       />
@@ -31,7 +31,7 @@ export const TabNavigator = () => {
         component={FavoritesScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="heart" size={size} color={color} />
+            <HeartIcon width={size} height={size} color={color} />
           ),
         }}
       />
@@ -40,7 +40,7 @@ export const TabNavigator = () => {
         component={ProfileScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person" size={size} color={color} />
+            <PeopleIcon width={size} height={size} color={color} />
           ),
         }}
       />

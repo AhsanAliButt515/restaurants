@@ -21,7 +21,7 @@ export default function WelcomeScreen({ navigation }: any) {
         <Logo width={155} height={35} />
         <ThemedText style={styles.subtitle}>
           Hola,{"\n"}
-          Bienvenido a la prueba de Tailor hub, en ella has de añadir los restaurantes favoritos donde te gustaría ir en tu onboarding.
+          Bienvenido a la prueba de {"\n"}Tailor hub, en ella has de {"\n"} añadir los restaurantes {"\n"} favoritos donde te {"\n"} gustaría ir en tu {"\n"} onboarding.
         </ThemedText>
 
         <Button
@@ -52,11 +52,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
     marginBottom: 40,
-    fontSize: 22,
+    fontSize: 24,
     paddingHorizontal: '10%',
   },
   welcomeButton: {
-    width: '75%',
+    marginTop: 20,
+    width: '85%',
     borderRadius: 20,
   },
   buttonText: {

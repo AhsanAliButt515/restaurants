@@ -19,13 +19,14 @@ type Props = {
   data: Restaurant;
   isFavorite: boolean;
   hideComments?: boolean;
+  variant?: 'default' | 'map';
   onToggleFavorite: (restaurant: Restaurant) => void;
   onPress?: () => void;
   containerStyle?: StyleProp<ViewStyle>;
   cardStyle?: StyleProp<ViewStyle>;
 };
 
-export const RestaurantCard = ({ data, isFavorite, hideComments, onToggleFavorite, onPress, containerStyle, cardStyle }: Props) => {
+export const RestaurantCard = ({ data, isFavorite, hideComments, variant = 'default', onToggleFavorite, onPress, containerStyle, cardStyle }: Props) => {
   const navigation = useNavigation();
   const [resolvedAddress, setResolvedAddress] = useState<string | null>(null);
 
@@ -52,18 +53,19 @@ export const RestaurantCard = ({ data, isFavorite, hideComments, onToggleFavorit
   }, [data._id, data.address, data.latlng?.lat, data.latlng?.lng]);
 
   const displayAddress = data.address?.trim() || resolvedAddress || null;
+  const isMapVariant = variant === 'map';
 
   return (
-    <View style={[styles.container, containerStyle]}>
-      <View style={[styles.card, cardStyle]}>
+    <View style={[styles.container, isMapVariant && styles.containerMap, containerStyle]}>
+      <View style={[styles.card, isMapVariant && styles.cardMap, cardStyle]}>
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={() => (onPress ? onPress() : (navigation as any).navigate('RestaurantDetail', { id: data._id }))}
-          style={styles.cardContent}
+          style={[styles.cardContent, isMapVariant && styles.cardContentMap]}
         >
-          <Image source={{ uri: data.image }} style={styles.image} />
+          <Image source={{ uri: data.image }} style={[styles.image, isMapVariant && styles.imageMap]} />
 
-          <View style={styles.info}>
+          <View style={[styles.info, isMapVariant && styles.infoMap]}>
             <Text style={styles.name}>{data.name}</Text>
             {displayAddress ? (
               <Text style={styles.description} numberOfLines={2}>{displayAddress}</Text>
@@ -73,23 +75,25 @@ export const RestaurantCard = ({ data, isFavorite, hideComments, onToggleFavorit
             <View style={styles.bottomRow}>
               <CustomStarRating
                 rating={data?.avgRating || 0}
-                size={16}
+                size={isMapVariant ? 12 : 16}
               />
-              {!hideComments && <Text style={styles.price}>({data.reviews?.length} comentarios)</Text>}
+              <View>
+                {!hideComments && <Text style={styles.price}>({data.reviews?.length} comentarios)</Text>}
+              </View>
             </View>
           </View>
         </TouchableOpacity>
 
-        <View style={styles.favoriteContainer}>
+        <View style={[styles.favoriteContainer, isMapVariant && styles.favoriteContainerMap]}>
           <TouchableOpacity
-            style={styles.favoriteButton}
+            style={[styles.favoriteButton, isMapVariant && styles.favoriteButtonMap]}
             onPress={() => onToggleFavorite(data)}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <Ionicons
               name={isFavorite ? "heart" : "heart-outline"}
               size={24}
-              color={isFavorite ? "#000" : "#666"}
+              color="#000"
             />
           </TouchableOpacity>
         </View>
@@ -103,6 +107,9 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: 16,
   },
+  containerMap: {
+    marginBottom: 0,
+  },
   card: {
     flexDirection: 'row',
     backgroundColor: '#fff',
@@ -115,20 +122,35 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     height: 80,
   },
+  cardMap: {
+    // add internal padding so content doesn't touch the border (map variant)
+    borderRadius: 12,
+    height: 84,
+    padding: 8,
+  },
   cardContent: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
   },
-  favoriteContainer: {
-    width: 50,
-
+  cardContentMap: {
+    // card already has padding in map variant
     alignItems: 'center',
-
-
+  },
+  favoriteContainer: {
+    width: 32,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
   },
   favoriteButton: {
-    padding: 8,
+    paddingVertical: 8,
+  },
+  favoriteButtonMap: {
+    // remove top padding so heart aligns to top
+    paddingTop: 0,
+    paddingRight: 0,
+    paddingLeft: 8,
+    paddingBottom: 8,
   },
   image: {
     width: 80,
@@ -136,13 +158,22 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 16,
     borderTopRightRadius: 16,
   },
+  imageMap: {
+    width: 68,
+    height: 68,
+    borderRadius: 16,
+    marginRight: 10,
+  },
   info: {
     flex: 1,
     padding: 8,
     justifyContent: 'center',
   },
+  infoMap: {
+    padding: 0,
+  },
   name: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
   },
   description: {
@@ -156,7 +187,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   price: {
-    fontWeight: 'bold',
     fontSize: 14,
+  },
+  favoriteContainerMap: {
+    width: 44,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
   },
 });

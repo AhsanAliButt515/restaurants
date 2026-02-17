@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { useVerifyQuery } from '../api/auth';
 import api from '../api/client';
 import SplashScreen from '../screens/SplashScreen';
@@ -107,9 +107,9 @@ export const RootNavigator = () => {
 
   return (
     <AuthContext.Provider value={contextValue}>
-      <View style={styles.container}>
+      
         {isAuthenticated ? <DrawerNavigator /> : <AuthStack />}
-      </View>
+      
     </AuthContext.Provider>
   );
 };

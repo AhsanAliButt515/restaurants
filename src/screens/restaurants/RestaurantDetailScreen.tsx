@@ -9,8 +9,10 @@ import { CustomStarRating } from '@/components/CustomStarRating';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Button } from '@/components/ui/Button';
-import { useRoute } from '@react-navigation/native';
-import React, { useState } from 'react';
+import { useFavorites } from '@/hooks/useFavorites';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import React, { useLayoutEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -25,16 +27,23 @@ import {
 
 export default function RestaurantDetailScreen() {
   const route = useRoute();
+  const navigation = useNavigation();
   const id = (route.params as { id?: string })?.id ?? '';
   const { data: restaurant, isLoading, error } = useRestaurantDetailQuery(id);
   const createComment = useCreateCommentMutation(id);
   const deleteCommentMutation = useDeleteCommentMutation(id);
+  const { isFavorite, toggleFavorite } = useFavorites();
 
   const [rating, setRating] = useState(0);
   const [commentText, setCommentText] = useState('');
   const [validationError, setValidationError] = useState<string | null>(null);
   const [selectedReviewId, setSelectedReviewId] = useState<string | null>(null);
   const [editingReview, setEditingReview] = useState<Comment | null>(null);
+
+  useLayoutEffect(() => {
+    // Remove the native header; we render controls on the hero image.
+    (navigation as any)?.setOptions?.({ headerShown: false });
+  }, [navigation]);
 
   const handleSubmitReview = () => {
     setValidationError(null);
@@ -88,6 +97,7 @@ export default function RestaurantDetailScreen() {
   }
 
   const reviews = restaurant.reviews ?? [];
+  const fav = isFavorite(restaurant._id);
 
   return (
     <ThemedView style={styles.container}>
@@ -100,33 +110,55 @@ export default function RestaurantDetailScreen() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <Image source={{ uri: restaurant.image }} style={styles.heroImage} />
+          <View style={styles.heroWrap}>
+            <Image source={{ uri: restaurant.image }} style={styles.heroImage} />
+            <View style={styles.heroScrim} pointerEvents="none" />
+
+            <View style={styles.heroTopRow}>
+              <TouchableOpacity
+                onPress={() => (navigation as any).goBack?.()}
+                activeOpacity={0.8}
+                style={styles.heroIconBtn}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <Ionicons name="chevron-back" size={22} color="#fff" />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => toggleFavorite(restaurant)}
+                activeOpacity={0.8}
+                style={styles.heroIconBtn}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <Ionicons name={fav ? 'heart' : 'heart-outline'} size={22} color="#fff" />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.heroCenter}>
+              <ThemedText type="title" style={styles.heroTitle}>
+                {restaurant.name}
+              </ThemedText>
+              {restaurant.address ? (
+                <ThemedText style={styles.heroSubtitle} numberOfLines={2}>
+                  {restaurant.address}
+                </ThemedText>
+              ) : null}
+            </View>
+          </View>
 
           <View style={styles.section}>
-            <ThemedText type="title" style={styles.name}>
-              {restaurant.name}
-            </ThemedText>
-            {restaurant.address ? (
-              <ThemedText style={styles.address}>{restaurant.address}</ThemedText>
-            ) : null}
             <ThemedText style={styles.description}>{restaurant.description}</ThemedText>
-            {restaurant.avgRating != null && (
-              <View style={styles.avgRow}>
-                <CustomStarRating rating={restaurant.avgRating} size={18} />
-                <ThemedText style={styles.avgText}>{restaurant.avgRating.toFixed(1)}</ThemedText>
-              </View>
-            )}
           </View>
 
           {/* Create review form */}
           <View style={styles.reviewBox}>
-            <ThemedText style={styles.reviewBoxTitle}>Deja tu opinión</ThemedText>
+
             <View style={styles.starsRow}>
-              <CustomStarRating rating={rating} size={28} onRatingChange={setRating} />
+              <CustomStarRating rating={rating} size={24} onRatingChange={setRating} />
             </View>
             <TextInput
               style={styles.commentInput}
-              placeholder="Escribe tu comentario (10-255 caracteres)..."
+              placeholder="Escribe tu comentario sobre el restaurante"
               placeholderTextColor="#999"
               value={commentText}
               onChangeText={(t) => {
@@ -144,15 +176,14 @@ export default function RestaurantDetailScreen() {
               onPress={handleSubmitReview}
               loading={createComment.isPending}
               disabled={!rating || !commentText.trim()}
-              style={styles.submitButton}
+              variant="outline"
+              fullWidth={false}
+              style={{ borderRadius: 12, paddingHorizontal: 24, paddingVertical: 8 }}
             />
           </View>
 
           {/* Reviews list */}
           <View style={styles.section}>
-            <ThemedText type="subtitle" style={styles.reviewsSectionTitle}>
-              Reseñas ({reviews.length})
-            </ThemedText>
             {reviews.length === 0 ? (
               <ThemedText style={styles.noReviews}>Aún no hay reseñas.</ThemedText>
             ) : (
@@ -205,16 +236,19 @@ function ReviewCard({
   const displayDate = review.date ?? review.createdAt ?? '';
   const dateStr = displayDate
     ? new Date(displayDate).toLocaleDateString('es-ES', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-      })
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    })
     : '';
 
   return (
     <TouchableOpacity style={styles.reviewCard} onPress={onPress} activeOpacity={0.8}>
       <View style={styles.reviewCardHeader}>
         <ThemedText style={styles.reviewAuthor}>{displayName}</ThemedText>
+
+      </View>
+      <View style={styles.reviewStarsRow}>
         <CustomStarRating rating={review.rating} size={14} />
       </View>
       {dateStr ? <ThemedText style={styles.reviewDate}>{dateStr}</ThemedText> : null}
@@ -283,8 +317,8 @@ function EditReviewForm({
   return (
     <View style={styles.reviewBox}>
       <ThemedText style={styles.reviewBoxTitle}>Editar reseña</ThemedText>
-      <View style={styles.starsRow}>
-        <CustomStarRating rating={rating} size={28} onRatingChange={setRating} />
+      <View style={styles.reviewStarsRow}>
+        <CustomStarRating rating={rating} size={24} onRatingChange={setRating} />
       </View>
       <TextInput
         style={styles.commentInput}
@@ -319,14 +353,55 @@ const styles = StyleSheet.create({
   keyboardView: { flex: 1 },
   scroll: { flex: 1 },
   scrollContent: { paddingBottom: 24 },
+  heroWrap: {
+    position: 'relative',
+    width: '100%',
+    height: 220,
+    backgroundColor: '#eee',
+  },
   heroImage: {
     width: '100%',
     height: 220,
     backgroundColor: '#eee',
   },
+  heroScrim: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.25)',
+  },
+  heroTopRow: {
+    position: 'absolute',
+    top: 14,
+    left: 14,
+    right: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  heroIconBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.35)',
+  },
+  heroCenter: {
+    ...StyleSheet.absoluteFillObject,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heroTitle: {
+    color: '#fff',
+    textAlign: 'center',
+  },
+  heroSubtitle: {
+    marginTop: 6,
+    color: 'rgba(255,255,255,0.92)',
+    textAlign: 'center',
+    fontSize: 14,
+  },
   section: { paddingHorizontal: 16, paddingTop: 20 },
-  name: { marginBottom: 4 },
-  address: { fontSize: 14, color: '#666', marginBottom: 12 },
   description: { fontSize: 15, lineHeight: 22, marginBottom: 8 },
   avgRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   avgText: { fontSize: 15, fontWeight: '600' },
@@ -337,7 +412,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: '#e0e0e0',
-    backgroundColor: '#fafafa',
   },
   reviewBoxTitle: { fontSize: 16, fontWeight: '600', marginBottom: 12 },
   starsRow: { marginBottom: 12 },
@@ -352,18 +426,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   commentInput: {
-    borderWidth: 1,
-    borderColor: '#ddd',
+
     borderRadius: 12,
-    paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 15,
     minHeight: 88,
     textAlignVertical: 'top',
-    marginBottom: 12,
     backgroundColor: '#fff',
   },
-  submitButton: { alignSelf: 'stretch' },
+  submitButton: { width: 'auto', backgroundColor: '#fff', borderWidth: 1, borderColor: '#000', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10 },
   validationError: { color: '#c00', fontSize: 13, marginBottom: 8 },
   reviewsSectionTitle: { marginBottom: 12 },
   noReviews: { fontSize: 14, color: '#888' },
@@ -379,6 +450,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 4,
   },
+  reviewStarsRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 6, justifyContent: 'flex-end' },
   reviewAuthor: { fontSize: 15, fontWeight: '600' },
   reviewDate: { fontSize: 12, color: '#888', marginBottom: 6 },
   reviewComment: { fontSize: 14, lineHeight: 20, color: '#333', marginBottom: 12 },

@@ -12,7 +12,7 @@ export const DrawerButton = () => {
 
   return (
     <TouchableOpacity
-      style={[styles.button, { backgroundColor: theme.primary }]}
+      style={[styles.button]}
       onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}
       activeOpacity={0.7}
     >
@@ -37,5 +37,6 @@ const styles = StyleSheet.create({
     shadowRadius: 4.65,
     elevation: 8,
     zIndex: 999,
+    backgroundColor: '#264BEB'
   },
 });

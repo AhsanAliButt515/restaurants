@@ -2,7 +2,9 @@ import { uploadRestaurantImage, useCreateRestaurantMutation } from '@/api/restau
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Button } from '@/components/ui/Button';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { IconSymbol } from '@/components/ui/icon-symbol';
+import { TextField } from '@/components/ui/TextField';
+import { StarIcon } from '@/utils/svgs';
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import { StatusBar } from 'expo-status-bar';
@@ -286,7 +288,11 @@ export default function CreateRestaurantScreen() {
           showsVerticalScrollIndicator={false}
         >
           <ThemedView style={styles.container}>
-            <ThemedText type="title" style={styles.title}>Nuevo Restaurante</ThemedText>
+            <View style={styles.logoContainer}>
+
+              <StarIcon size={48} />
+            </View>
+
 
             {/* 1. Image on top */}
             <View style={styles.imageContainerWrapper}>
@@ -308,29 +314,44 @@ export default function CreateRestaurantScreen() {
                   />
                 ) : (
                   <View style={styles.imagePlaceholder}>
-                    <Ionicons name="camera" size={40} color="#264BEB" />
-                    <ThemedText style={styles.imagePlaceholderText}>Subir imagen</ThemedText>
+                    <IconSymbol name="plus" size={36} color="#000" />
+
+                    <ThemedText style={styles.imagePlaceholderText}>Añadir imágen</ThemedText>
                   </View>
                 )}
               </TouchableOpacity>
             </View>
 
             {/* 2. Name */}
-            <ThemedText style={styles.label}>Nombre de restaurante:</ThemedText>
+            {/* <ThemedText type='subtitle' >Nombre de restaurante:</ThemedText>
             <TextInput
               style={[styles.input, errors.name && styles.inputError]}
               value={name}
               onChangeText={(t) => { setName(t); clearFieldError('name'); }}
               placeholder="Nombre del restaurante"
+            /> */}
+            <TextField
+              title="Nombre del restaurante"
+              placeholder="Nombre del restaurante"
+              value={name}
+              onChange={(t) => { setName(t); clearFieldError('name'); }}
+              inputStyle={{
+                backgroundColor: 'transparent',
+                borderColor: '#000',
+                color: '#fff',
+              }}
             />
+
+
             {errors.name ? <Text style={styles.fieldError}>{errors.name}</Text> : null}
 
             {/* 3. Google Places */}
-            <ThemedText style={styles.label}>Dirección del restaurante</ThemedText>
+            <ThemedText type='subtitle' style={styles.fontStyle} >Dirección del restaurante</ThemedText>
             <View style={[styles.autocompleteWrapper, errors.location && styles.autocompleteError]}>
               <GooglePlacesAutocomplete
+
                 ref={ref}
-                placeholder="Buscar en Google Maps (selecciona un resultado)"
+                placeholder="Dirección "
                 fetchDetails={true}
                 keyboardShouldPersistTaps="handled"
                 onPress={(data, details = null) => {
@@ -377,7 +398,7 @@ export default function CreateRestaurantScreen() {
 
             {/* 4. Description + submit - extra top margin so section is visible and scrollable */}
             <View style={styles.formSection}>
-              <ThemedText style={styles.label}>Descripción del restaurante</ThemedText>
+              <ThemedText type='subtitle' style={styles.fontStyle}>Descripción del restaurante</ThemedText>
               <TextInput
                 style={[styles.input, styles.textArea, errors.description && styles.inputError]}
                 value={description}
@@ -416,6 +437,10 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
+  fontStyle: {
+    marginTop: 10,
+    fontSize: 24
+  },
   scrollContainer: {
     flexGrow: 1,
     paddingBottom: 60,
@@ -434,7 +459,6 @@ const styles = StyleSheet.create({
   },
   formSection: {
     width: '100%',
-    marginTop: 24,
     marginBottom: 24,
   },
   label: {
@@ -445,12 +469,13 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: '#f8f9fa',
-    borderRadius: 12,
+    borderRadius: 24,
     padding: 15,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: '#000',
     color: '#000',
+    marginVertical: 10,
   },
   inputError: {
     borderColor: '#FF3B30',
@@ -493,8 +518,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   imageContainer: {
-    width: '80%',
-    height: 150,
+    width: 204,
+    height: 204,
     borderRadius: 10,
     backgroundColor: '#e5e7eb',
     overflow: 'hidden',
@@ -512,7 +537,7 @@ const styles = StyleSheet.create({
   },
   imagePlaceholderText: {
     marginTop: 8,
-    color: '#264BEB',
+    color: '#000',
     fontWeight: '600',
   },
   submitButton: {

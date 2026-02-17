@@ -4,6 +4,7 @@ import { RestaurantCard } from '@/components/RestaurantCard';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useFavorites } from '@/hooks/useFavorites';
+import { MapIcon } from '@/utils/svgs';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import React, { useRef, useState } from 'react';
@@ -156,10 +157,11 @@ export default function RestaurantListScreen() {
     <ThemedView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <ThemedText type="title" style={styles.title}>Restaurantes</ThemedText>
+        <ThemedText type="title" style={styles.title}>{viewMode === 'map' ? 'Mapa' : 'Restaurantes'}</ThemedText>
         <View style={styles.headerActions}>
           <TouchableOpacity style={styles.iconButton} onPress={handleMapPress}>
-            <Ionicons name="map" size={24} color={viewMode === 'map' ? '#000' : '#CCC'} />
+            <MapIcon size={28} color={viewMode === 'map' ? '#000' : '#CCC'} />
+            {/* <Ionicons name="map-" size={24} color={viewMode === 'map' ? '#000' : '#CCC'} /> */}
           </TouchableOpacity>
           <TouchableOpacity style={styles.iconButton} onPress={handleListPress}>
             <Ionicons name="list" size={24} color={viewMode === 'list' ? '#000' : '#CCC'} />
@@ -240,6 +242,7 @@ export default function RestaurantListScreen() {
                         <RestaurantCard
                           data={restaurant}
                           hideComments={true}
+                          variant="map"
                           isFavorite={isFavorite(restaurant._id)}
                           onToggleFavorite={() => toggleFavorite(restaurant)}
                           onPress={() => {
@@ -278,6 +281,7 @@ const styles = StyleSheet.create({
   mapCardWrap: {
     width: MAP_CARD_WIDTH,
     marginRight: MAP_CARD_MARGIN,
+    paddingVertical: 6,
   },
   header: {
     flexDirection: 'row',
@@ -349,9 +353,11 @@ const styles = StyleSheet.create({
   },
   mapCardsScrollContent: {
     paddingRight: 12,
+    paddingLeft: 4,
   },
   mapCardContainerOverride: {
     marginBottom: 0,
+    paddingHorizontal: 0,
   },
   mapCardCardOverride: {
     borderWidth: 2,
@@ -362,9 +368,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f4ff',
   },
   iconButton: {
-    marginLeft: 15,
-    padding: 8,
-    backgroundColor: '#f8f9fa',
+    marginLeft: 30,
     borderRadius: 12,
   },
   listContent: {

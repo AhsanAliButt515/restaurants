@@ -1,8 +1,8 @@
 import { useLoginMutation, useSignupMutation } from '@/api/auth';
-import { ThemedText } from '@/components/themed-text';
+import { TextField } from '@/components/ui/TextField';
 import { Colors } from '@/constants/theme';
 import { saveAccess, saveToken, saveUser } from '@/storage/auth';
-import { BlueLogo } from '@/utils/svgs';
+import { BackArrow, BlueLogo } from '@/utils/svgs';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -14,7 +14,6 @@ import {
     ScrollView,
     StyleSheet,
     Text,
-    TextInput,
     TouchableOpacity,
     View
 } from 'react-native';
@@ -206,130 +205,146 @@ export default function LoginScreen() {
                             },
                         ]}
                     >
+                        {mode === 'login' ? (
+                            // === LOGIN MODE: keep current layout ===
+                            <View style={styles.form}>
+                                <TextField
+                                    title="Email"
+                                    placeholder="Escribe tu email"
+                                    value={email}
+                                    onChangeText={setEmail}
+                                    titleStyle={{ fontSize: 24, color: '#fff' }}
+                                    inputStyle={{
+                                        backgroundColor: 'transparent',
+                                        borderColor: Colors.light.inputBorder,
+                                        color: '#fff',
+                                    }}
+                                    placeholderTextColor="rgba(255,255,255,0.6)"
+                                />
+                                <TextField
+                                    title="Contraseña"
+                                    placeholder="Esccribe tu nombre"
+                                    value={password}
+                                    onChangeText={setPassword}
+                                    titleStyle={{ fontSize: 24, color: '#fff' }}
+                                    inputStyle={{
+                                        backgroundColor: 'transparent',
+                                        borderColor: Colors.light.inputBorder,
+                                        color: '#fff',
+                                    }}
+                                    placeholderTextColor="rgba(255,255,255,0.6)"
+                                    secureTextEntry
+                                />
+                                {error ? <Text style={styles.error}>{error}</Text> : null}
+                                <Button
+                                    title={loginMutation.isPending ? 'Entrando...' : 'Entrar'}
+                                    variant="secondary"
+                                    textStyle={{
+                                        color: '#000'
+                                    }}
+                                    style={styles.authButton}
+                                    onPress={handleLogin}
+                                    loading={loginMutation.isPending}
+                                />
 
-                        {/* BACK BUTTON */}
-
-                        {mode !== 'login' && (
-                            <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-                                <Text style={{ color: '#fff', fontSize: 28 }}>←</Text>
-                            </TouchableOpacity>
-                        )}
-
-                        <View style={styles.form}>
-
-                            {/* ================= LOGIN ================= */}
-
-                            {mode === 'login' && (
-
-                                <>
-                                    <ThemedText type="subtitle" style={styles.label}>Email</ThemedText>
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="Escribe tu email"
-                                        placeholderTextColor="rgba(255,255,255,0.6)"
-                                        autoCapitalize="none"
-                                        value={email}
-                                        onChangeText={setEmail}
-                                    />
-                                    <Text style={styles.label}>Contraseña</Text>
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="Esccribe tu nombre"
-                                        placeholderTextColor="rgba(255,255,255,0.6)"
-                                        secureTextEntry
-                                        value={password}
-                                        onChangeText={setPassword}
-                                    />
-                                    {error ? <Text style={styles.error}>{error}</Text> : null}
-                                    <Button
-                                        title={loginMutation.isPending ? 'Entrando...' : 'Entrar'}
-                                        variant="secondary"
-                                        textStyle={{
-                                            color: '#000'
-                                        }}
-                                        style={styles.authButton}
-                                        onPress={handleLogin}
-                                        loading={loginMutation.isPending}
-                                    />
-
-                                    <TouchableOpacity onPress={() => {
+                                <TouchableOpacity
+                                    onPress={() => {
                                         setMode('register-info');
                                         setError('');
                                         setEmail('');
                                         setUsername('');
                                         setPassword('');
-                                    }}>
-                                        <Text style={styles.linkText}>
-                                            ¿No tienes cuenta?{' '}
-                                            <Text style={styles.linkHighlight}>Regístrate</Text>
-                                        </Text>
-                                    </TouchableOpacity>
-                                </>
-                            )}
+                                    }}
+                                >
+                                    <Text style={styles.linkText}>
+                                        ¿No tienes cuenta?{' '}
+                                        <Text style={styles.linkHighlight}>Regístrate</Text>
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        ) : (
+                            // === REGISTER MODES: back button on top, fields at bottom, minHeight 414 ===
+                            <View style={styles.registerContainer}>
+                                <TouchableOpacity onPress={handleBack} style={styles.backButton}>
+                                    <BackArrow width={24} height={24} />
+                                </TouchableOpacity>
 
-                            {/* =================  REGISTER STEP 1 ================= */}
+                                <View style={styles.form}>
+                                    {mode === 'register-info' && (
+                                        <>
+                                            <TextField
+                                                title="Email"
+                                                placeholder="Añade tu email"
+                                                value={email}
+                                                onChangeText={setEmail}
+                                                titleStyle={{ fontSize: 24, color: '#fff' }}
+                                                inputStyle={{
+                                                    backgroundColor: 'transparent',
+                                                    borderColor: Colors.light.inputBorder,
+                                                    color: '#fff',
+                                                }}
+                                                placeholderTextColor="rgba(255,255,255,0.6)"
+                                            />
 
-                            {mode === 'register-info' && (
-                                <>
-                                    <Text style={styles.label}>Email</Text>
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="Añade tu email"
-                                        placeholderTextColor="rgba(255,255,255,0.6)"
-                                        value={email}
-                                        onChangeText={setEmail}
-                                        keyboardType="email-address"
-                                    />
-                                    <Text style={styles.label}>Nombre de usuario</Text>
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="Añade tu nombre"
-                                        placeholderTextColor="rgba(255,255,255,0.6)"
-                                        value={username}
-                                        onChangeText={setUsername}
-                                    />
-                                    {error ? <Text style={styles.error}>{error}</Text> : null}
+                                            <TextField
+                                                title="Nombre de usuario"
+                                                placeholder="Añade tu nombre"
+                                                value={username}
+                                                onChangeText={setUsername}
+                                                titleStyle={{ fontSize: 24, color: '#fff' }}
+                                                inputStyle={{
+                                                    backgroundColor: 'transparent',
+                                                    borderColor: Colors.light.inputBorder,
+                                                    color: '#fff',
+                                                }}
+                                                placeholderTextColor="rgba(255,255,255,0.6)"
+                                            />
+                                            {error ? <Text style={styles.error}>{error}</Text> : null}
 
-                                    <Button
-                                        title="Continuar"
-                                        variant="secondary"
-                                        textStyle={{
-                                            color: '#000'
-                                        }}
-                                        style={styles.authButton}
-                                        onPress={handleRegisterInfo}
-                                    />
-                                </>
-                            )}
+                                            <Button
+                                                title="Continuar"
+                                                variant="secondary"
+                                                textStyle={{
+                                                    color: '#000'
+                                                }}
+                                                style={styles.authButton}
+                                                onPress={handleRegisterInfo}
+                                            />
+                                        </>
+                                    )}
 
-                            {/* ================= REGISTER STEP 2 ================= */}
-
-                            {mode === 'register-password' && (
-                                <>
-                                    <Text style={styles.label}>Crea una nueva contraseña</Text>
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="Nueva contraseña"
-                                        placeholderTextColor="rgba(255,255,255,0.6)"
-                                        secureTextEntry
-                                        value={password}
-                                        onChangeText={setPassword}
-                                    />
-                                    {error ? <Text style={styles.error}>{error}</Text> : null}
-                                    <Button
-                                        title={signupMutation.isPending ? 'Creando...' : 'Crear cuenta'}
-                                        disabled={signupMutation.isPending}
-                                        variant="secondary"
-                                        textStyle={{
-                                            color: '#000'
-                                        }}
-                                        style={styles.authButton}
-                                        onPress={handleSignup}
-                                        loading={signupMutation.isPending}
-                                    />
-                                </>
-                            )}
-                        </View>
+                                    {mode === 'register-password' && (
+                                        <>
+                                            <TextField
+                                                title="Crea una nueva contraseña"
+                                                placeholder="Nueva contraseña"
+                                                value={password}
+                                                onChangeText={setPassword}
+                                                titleStyle={{ fontSize: 24, color: '#fff' }}
+                                                inputStyle={{
+                                                    backgroundColor: 'transparent',
+                                                    borderColor: Colors.light.inputBorder,
+                                                    color: '#fff',
+                                                }}
+                                                placeholderTextColor="rgba(255,255,255,0.6)"
+                                            />
+                                            {error ? <Text style={styles.error}>{error}</Text> : null}
+                                            <Button
+                                                title={signupMutation.isPending ? 'Creando...' : 'Crear cuenta'}
+                                                disabled={signupMutation.isPending}
+                                                variant="secondary"
+                                                textStyle={{
+                                                    color: '#000'
+                                                }}
+                                                style={styles.authButton}
+                                                onPress={handleSignup}
+                                                loading={signupMutation.isPending}
+                                            />
+                                        </>
+                                    )}
+                                </View>
+                            </View>
+                        )}
                     </Animated.View>
                 </View>
             </ScrollView>
@@ -346,15 +361,16 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         flexGrow: 1,
-        paddingBottom: 40,
     },
     container: {
         flex: 1,
         minHeight: 400,
         backgroundColor: '#FFFFFF',
+        padding: 16,
     },
     logoWrapper: {
         flex: 1,
+        marginTop: 10,
         alignItems: 'center',
     },
     logo: {
@@ -363,18 +379,20 @@ const styles = StyleSheet.create({
         resizeMode: 'contain',
     },
     backButton: {
-        padding: 2,
-        paddingHorizontal: 24,
+        paddingHorizontal: 32,
+        paddingVertical: 10,
         borderColor: '#fff',
         borderWidth: 1,
-        borderRadius: 16,
+        borderRadius: 24,
+        alignItems: 'center',
+        justifyContent: 'center',
         alignSelf: 'flex-start',
-        marginBottom: 10,
+        marginBottom: 24,
+        width: 110,
     },
     bottomContainer: {
         backgroundColor: '#264BEB',
-        borderTopLeftRadius: 30,
-        borderTopRightRadius: 30,
+        borderRadius: 30,
         paddingHorizontal: 30,
         paddingTop: 40,
         paddingBottom: Platform.OS === 'ios' ? 40 : 30,
@@ -384,11 +402,16 @@ const styles = StyleSheet.create({
         shadowRadius: 10,
         elevation: 20,
     },
-
+    // Shared form styles
     form: {
 
         gap: 15,
-
+    },
+    // Container for registration & password modes:
+    // back button on top, fields at bottom, minHeight 414
+    registerContainer: {
+        minHeight: 414,
+        justifyContent: 'space-between',
     },
 
     input: {
