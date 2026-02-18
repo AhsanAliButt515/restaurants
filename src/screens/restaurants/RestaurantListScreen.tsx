@@ -172,14 +172,16 @@ export default function RestaurantListScreen() {
       {/* Content Area */}
       <View style={styles.content}>
         {viewMode === 'list' ? (
-          <FlatList
-            data={restaurantList}
-            keyExtractor={(item) => item._id}
-            renderItem={renderListItem}
-            contentContainerStyle={styles.listContent}
-            showsVerticalScrollIndicator={false}
-            ListFooterComponent={totalPages > 1 ? renderPaginationFooter : null}
-          />
+          <View style={styles.contentList}>
+            <FlatList
+              data={restaurantList}
+              keyExtractor={(item) => item._id}
+              renderItem={renderListItem}
+              contentContainerStyle={styles.listContent}
+              showsVerticalScrollIndicator={false}
+              ListFooterComponent={totalPages > 1 ? renderPaginationFooter : null}
+            />
+          </View>
         ) : (
           <View style={styles.mapContainer}>
             <MapView
@@ -224,18 +226,23 @@ export default function RestaurantListScreen() {
               })}
             </MapView>
             {/* Bottom overlay: horizontal scroll of restaurant cards */}
-            {restaurantList.length > 0 && (
-              <View style={styles.mapCardsOverlay} pointerEvents="box-none">
-                <ScrollView
-                  ref={mapCardsScrollRef}
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={styles.mapCardsScrollContent}
-                  style={styles.mapCardsScroll}
-                >
-                  {restaurantList.map((restaurant) => {
-                    const hasLocation = restaurant.latlng && restaurant.latlng.lat != null && restaurant.latlng.lng != null;
-                    if (!hasLocation) return null;
+            <View style={styles.mapCardsOverlay} pointerEvents="box-none">
+              <ScrollView
+                ref={mapCardsScrollRef}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.mapCardsScrollContent}
+                style={styles.mapCardsScroll}
+              >
+                {/* First: restaurants with location (synced with markers) */}
+                {restaurantList
+                  .filter(
+                    (restaurant) =>
+                      restaurant.latlng &&
+                      restaurant.latlng.lat != null &&
+                      restaurant.latlng.lng != null
+                  )
+                  .map((restaurant) => {
                     const isSelected = selectedMarkerId === restaurant._id;
                     return (
                       <View key={restaurant._id} style={styles.mapCardWrap}>
@@ -255,9 +262,33 @@ export default function RestaurantListScreen() {
                       </View>
                     );
                   })}
-                </ScrollView>
-              </View>
-            )}
+
+                {/* Then: restaurants without location (no marker, still shown as cards at the end) */}
+                {restaurantList
+                  .filter(
+                    (restaurant) =>
+                      !restaurant.latlng ||
+                      restaurant.latlng.lat == null ||
+                      restaurant.latlng.lng == null
+                  )
+                  .map((restaurant) => (
+                    <View key={restaurant._id} style={styles.mapCardWrap}>
+                      <RestaurantCard
+                        data={restaurant}
+                        hideComments={true}
+                        variant="map"
+                        isFavorite={isFavorite(restaurant._id)}
+                        onToggleFavorite={() => toggleFavorite(restaurant)}
+                        onPress={() => {
+                          (navigation as any).navigate('RestaurantDetail', { id: restaurant._id });
+                        }}
+                        containerStyle={styles.mapCardContainerOverride}
+                        cardStyle={styles.mapCardCardOverride}
+                      />
+                    </View>
+                  ))}
+              </ScrollView>
+            </View>
           </View>
         )}
       </View>
@@ -268,10 +299,15 @@ export default function RestaurantListScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 15,
   },
   content: {
     flex: 1,
+  },
+  contentList: {
+    paddingHorizontal: 16,
+  },
+  contentMap: {
+    paddingHorizontal: 16,
   },
   centerContainer: {
     flex: 1,
@@ -279,7 +315,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   mapCardWrap: {
-    width: MAP_CARD_WIDTH,
+    // width: MAP_CARD_WIDTH,
     marginRight: MAP_CARD_MARGIN,
     paddingVertical: 6,
   },
@@ -288,6 +324,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingBottom: 15,
+    paddingHorizontal: 16,
   },
   title: {
     fontSize: 28,
@@ -344,7 +381,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    paddingHorizontal: 12,
+    paddingLeft: 4,
     paddingBottom: 16,
     paddingTop: 12,
   },
@@ -362,6 +399,7 @@ const styles = StyleSheet.create({
   mapCardCardOverride: {
     borderWidth: 2,
     borderColor: 'transparent',
+    borderRadius: 20,
   },
   mapCardSelected: {
     borderColor: '#264BEB',

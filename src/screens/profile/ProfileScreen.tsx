@@ -14,6 +14,7 @@ import {
   View,
 } from "react-native";
 
+import { getUser } from "@/storage/auth";
 import { EditIcon } from "@/utils/svgs";
 import { Button } from "../../components/ui/Button";
 
@@ -50,7 +51,20 @@ export default function ProfileScreen() {
       setNacimiento(formatDate(selectedDate));
     }
   };
-
+  useEffect(() => {
+    const fetchUser = async () => {
+      const user = await getUser();
+      console.log('user', user);
+      if (user) {
+        const userData = JSON.parse(user);
+        setUsername(userData.name);
+        setDni(userData.dni);
+        setDireccion(userData.direccion);
+        setNacimiento(userData.nacimiento);
+      }
+    };
+    fetchUser();
+  }, []);
   useEffect(() => {
     if (editableField === "dni") {
       requestAnimationFrame(() => dniRef.current?.focus());
@@ -92,7 +106,7 @@ export default function ProfileScreen() {
       </TouchableOpacity>
 
       <ThemedText type="title" style={{ marginTop: 20 }}>
-        Nombre de usuario
+        {username}
       </ThemedText>
 
       <View style={styles.inputContainer}>
