@@ -352,8 +352,8 @@ const styles = StyleSheet.create({
     flexGrow: 0,
   },
   mapCardsScrollContent: {
-    paddingRight: 12,
-    paddingLeft: 4,
+    // paddingRight: 12,
+    // paddingLeft: 4,
   },
   mapCardContainerOverride: {
     marginBottom: 0,
