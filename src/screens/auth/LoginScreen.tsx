@@ -266,7 +266,7 @@ export default function LoginScreen() {
                             // === REGISTER MODES: back button on top, fields at bottom, minHeight 414 ===
                             <View style={styles.registerContainer}>
                                 <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-                                    <BackArrow width={24} height={24} />
+                                    <BackArrow width={28} height={28} />
                                 </TouchableOpacity>
 
                                 <View style={styles.form}>
@@ -380,7 +380,7 @@ const styles = StyleSheet.create({
     },
     backButton: {
         paddingHorizontal: 32,
-        paddingVertical: 10,
+        paddingVertical: 14,
         borderColor: '#fff',
         borderWidth: 1,
         borderRadius: 24,
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignSelf: 'flex-start',
         marginBottom: 24,
-        width: 110,
+        width: 100,
     },
     bottomContainer: {
         backgroundColor: '#264BEB',

@@ -3,7 +3,7 @@ import { ThemedView } from "@/components/themed-view";
 import { useAuthContext } from "@/navigation/RootNavigator";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Alert,
   Image,
@@ -14,6 +14,7 @@ import {
   View,
 } from "react-native";
 
+import { EditIcon } from "@/utils/svgs";
 import { Button } from "../../components/ui/Button";
 
 export default function ProfileScreen() {
@@ -23,6 +24,10 @@ export default function ProfileScreen() {
   const [dni, setDni] = useState("");
   const [direccion, setDireccion] = useState("");
   const [nacimiento, setNacimiento] = useState("");
+  const [editableField, setEditableField] = useState<null | "dni" | "direccion">(null);
+
+  const dniRef = useRef<TextInput>(null);
+  const direccionRef = useRef<TextInput>(null);
 
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [date, setDate] = useState<Date | null>(null);
@@ -45,6 +50,14 @@ export default function ProfileScreen() {
       setNacimiento(formatDate(selectedDate));
     }
   };
+
+  useEffect(() => {
+    if (editableField === "dni") {
+      requestAnimationFrame(() => dniRef.current?.focus());
+    } else if (editableField === "direccion") {
+      requestAnimationFrame(() => direccionRef.current?.focus());
+    }
+  }, [editableField]);
 
   const pickImage = async () => {
     const permissionResult =
@@ -78,7 +91,7 @@ export default function ProfileScreen() {
         )}
       </TouchableOpacity>
 
-      <ThemedText type="subtitle" style={{ marginTop: 20 }}>
+      <ThemedText type="title" style={{ marginTop: 20 }}>
         Nombre de usuario
       </ThemedText>
 
@@ -87,49 +100,94 @@ export default function ProfileScreen() {
         <ThemedText type="subtitle" style={styles.label}>
           DNI
         </ThemedText>
-        <TextInput
-          style={styles.input}
-          placeholder="03967380Q"
-          placeholderTextColor="#000"
-          value={dni}
-          onChangeText={setDni}
-        />
+        <View style={styles.fieldRow}>
+          <TextInput
+            ref={dniRef}
+            style={styles.input}
+            placeholder="03967380Q"
+            placeholderTextColor="#000"
+            value={dni}
+            onChangeText={setDni}
+            editable={editableField === "dni"}
+            selectTextOnFocus
+            onBlur={() => setEditableField(null)}
+          />
+          <TouchableOpacity
+            style={styles.editIconButton}
+            activeOpacity={0.7}
+            onPress={() => setEditableField((prev) => (prev === "dni" ? null : "dni"))}
+          >
+            <EditIcon />
+          </TouchableOpacity>
+        </View>
 
         {/* Fecha de nacimiento */}
         <ThemedText type="subtitle" style={styles.label}>
           Fecha de Nacimiento
         </ThemedText>
 
-        <TouchableOpacity onPress={() => setShowDatePicker(true)}>
-          <View pointerEvents="none">
+        <View style={styles.fieldRow}>
+          <TouchableOpacity
+            onPress={() => setShowDatePicker(true)}
+            style={{ flex: 1 }}
+            activeOpacity={0.7}
+          >
+            <View pointerEvents="none">
+              <TextInput
+                style={styles.input}
+                placeholder="12/12/1990"
+                placeholderTextColor="#000"
+                value={nacimiento}
+                editable={false}
+              />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.editIconButton}
+            onPress={() => {
+              setEditableField(null);
+              setShowDatePicker(true);
+            }}
+            activeOpacity={0.7}
+          >
+            <EditIcon />
+          </TouchableOpacity>
+        </View>
+        <View
+          style={{ marginTop: 56 }}
+        >
+          {/* Dirección */}
+          <ThemedText type="subtitle" style={styles.label}>
+            Dirección
+          </ThemedText>
+          <View style={styles.fieldRow}>
             <TextInput
+              ref={direccionRef}
               style={styles.input}
-              placeholder="12/12/1990"
+              placeholder="Calle de las Eras, 92"
               placeholderTextColor="#000"
-              value={nacimiento}
-              editable={false}
+              value={direccion}
+              onChangeText={setDireccion}
+              editable={editableField === "direccion"}
+              selectTextOnFocus
+              onBlur={() => setEditableField(null)}
             />
+            <TouchableOpacity
+              style={styles.editIconButton}
+              activeOpacity={0.7}
+              onPress={() => setEditableField((prev) => (prev === "direccion" ? null : "direccion"))}
+            >
+              <EditIcon />
+            </TouchableOpacity>
           </View>
-        </TouchableOpacity>
-
-        {/* Dirección */}
-        <ThemedText type="subtitle" style={styles.label}>
-          Dirección
-        </ThemedText>
-        <TextInput
-          style={styles.input}
-          placeholder="Calle de las Eras, 92"
-          placeholderTextColor="#000"
-          value={direccion}
-          onChangeText={setDireccion}
-        />
-
+        </View>
         <Button
-          title="Logout"
+          title="Salir"
           onPress={logout}
-          variant="secondary"
+
+          variant="outline"
           style={styles.logoutButton}
-          textStyle={{ color: '#fff' }}
+          textStyle={{ color: '#000' }}
         />
       </View>
 
@@ -166,25 +224,40 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
+  fieldRow: {
+    width: "100%",
+    marginVertical: 2,
+    position: "relative",
+  },
   input: {
     width: "100%",
     height: 45,
-    backgroundColor: "#e5e7eb",
-    borderRadius: 8,
-    paddingHorizontal: 12,
+    backgroundColor: "transparent",
+    borderRadius: 0,
+    paddingHorizontal: 0,
+    paddingRight: 32, // space for edit icon
     marginVertical: 2,
+    borderBottomWidth: 1,
+    borderBottomColor: "#000",
   },
   label: {
     color: "#000",
     fontSize: 16,
     marginBottom: 4,
     marginTop: 10,
+    fontFamily: 'Robert-B',
   },
   inputContainer: {
     width: "100%",
   },
   logoutButton: {
     marginTop: 30,
-    backgroundColor: '#ff4444',
+  },
+  editIconButton: {
+    position: "absolute",
+    right: 0,
+    top: 12,
+    paddingHorizontal: 4,
+    paddingVertical: 4,
   },
 });

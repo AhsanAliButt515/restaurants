@@ -1,4 +1,5 @@
 import { Restaurant } from '@/api/restaurants';
+import { ThemedText } from '@/components/themed-text';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
@@ -66,9 +67,10 @@ export const RestaurantCard = ({ data, isFavorite, hideComments, variant = 'defa
           <Image source={{ uri: data.image }} style={[styles.image, isMapVariant && styles.imageMap]} />
 
           <View style={[styles.info, isMapVariant && styles.infoMap]}>
-            <Text style={styles.name}>{data.name}</Text>
+
+            <ThemedText style={styles.name} type="defaultSemiBold">{data.name}</ThemedText>
             {displayAddress ? (
-              <Text style={styles.description} numberOfLines={2}>{displayAddress}</Text>
+              <ThemedText style={styles.description} >{displayAddress}</ThemedText>
             ) : null}
 
 
@@ -175,11 +177,13 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 16,
     fontWeight: 'bold',
+    fontFamily: 'Robert-B',
   },
   description: {
     fontSize: 14,
     color: '#0B0B0B',
     marginVertical: 2,
+    fontFamily: 'Robert-R',
   },
   bottomRow: {
     flexDirection: 'row',

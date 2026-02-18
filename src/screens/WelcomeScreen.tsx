@@ -51,12 +51,12 @@ const styles = StyleSheet.create({
   subtitle: {
     textAlign: 'center',
     marginTop: 20,
-    marginBottom: 40,
     fontSize: 24,
-    paddingHorizontal: '10%',
+    paddingHorizontal: '8%',
+    fontFamily: 'Robert-B',
   },
   welcomeButton: {
-    marginTop: 20,
+    marginTop: 24,
     width: '85%',
     borderRadius: 20,
   },

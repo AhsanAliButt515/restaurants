@@ -6,6 +6,8 @@ import {
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Button } from '@/components/ui/Button';
+import { TextField } from '@/components/ui/TextField';
+import { StarIcon } from '@/utils/svgs';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
@@ -21,9 +23,8 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -136,6 +137,13 @@ export default function EditRestaurantScreen() {
     }
   };
 
+  const removeImage = () => {
+    if (uploadingImage) return;
+    setImage(null);
+    setImageUrl('');
+    clearFieldError('image');
+  };
+
   const getImageValue = (): string => {
     if (imageUrl.trim()) return imageUrl.trim();
     if (image) return image;
@@ -207,95 +215,131 @@ export default function EditRestaurantScreen() {
           showsVerticalScrollIndicator={false}
         >
           <ThemedView style={styles.container}>
-            <ThemedText type="title" style={styles.title}>
-              Actualizar restaurante
-            </ThemedText>
+            <View style={styles.topLogoContainer}>
 
-            <View style={styles.imageContainerWrapper}>
-              <TouchableOpacity
-                style={[styles.imageContainer, errors.image && styles.inputError]}
-                onPress={pickImage}
-                disabled={uploadingImage}
-              >
-                {uploadingImage ? (
-                  <View style={styles.imagePlaceholder}>
-                    <ActivityIndicator color="#264BEB" size="large" />
-                    <ThemedText style={styles.imagePlaceholderText}>Subiendo...</ThemedText>
-                  </View>
-                ) : (image || imageUrl) ? (
-                  <Image
-                    source={{ uri: image || imageUrl }}
-                    style={styles.previewImage}
-                    resizeMode="cover"
-                  />
-                ) : (
-                  <View style={styles.imagePlaceholder}>
-                    <Ionicons name="camera" size={40} color="#264BEB" />
-                    <ThemedText style={styles.imagePlaceholderText}>Subir imagen</ThemedText>
-                  </View>
-                )}
-              </TouchableOpacity>
+              <StarIcon size={48} />
             </View>
 
-            <ThemedText style={styles.label}>Nombre de restaurante:</ThemedText>
-            <TextInput
-              style={[styles.input, errors.name && styles.inputError]}
+            <View style={styles.imageContainerWrapper}>
+              <View style={[styles.imageContainer, errors.image && styles.inputError]}>
+                <TouchableOpacity
+                  style={styles.imagePickButton}
+                  onPress={pickImage}
+                  disabled={uploadingImage}
+                  activeOpacity={0.85}
+                >
+                  {uploadingImage ? (
+                    <View style={styles.imagePlaceholder}>
+                      <ActivityIndicator color="#264BEB" size="large" />
+                      <ThemedText style={styles.imagePlaceholderText}>Subiendo...</ThemedText>
+                    </View>
+                  ) : (image || imageUrl) ? (
+                    <Image
+                      source={{ uri: image || imageUrl }}
+                      style={styles.previewImage}
+                      resizeMode="cover"
+                    />
+                  ) : (
+                    <View style={styles.imagePlaceholder}>
+                      <Ionicons name="camera" size={40} color="#264BEB" />
+                      <ThemedText style={styles.imagePlaceholderText}>Subir imagen</ThemedText>
+                    </View>
+                  )}
+                </TouchableOpacity>
+
+                {!uploadingImage && (image || imageUrl) ? (
+                  <TouchableOpacity
+                    style={styles.removeImageButton}
+                    onPress={removeImage}
+                    activeOpacity={0.85}
+                  >
+                    <Text style={styles.removeImageText}>Eliminar</Text>
+                  </TouchableOpacity>
+                ) : null}
+              </View>
+            </View>
+
+
+            <TextField
+              title="Nombre del restaurante"
               value={name}
               onChangeText={(t) => { setName(t); clearFieldError('name'); }}
               placeholder="Nombre del restaurante"
+              inputStyle={{
+                backgroundColor: 'transparent',
+                borderColor: '#000',
+                color: '#000',
+              }}
+              style={[errors.name && styles.inputError]}
             />
             {errors.name ? <Text style={styles.fieldError}>{errors.name}</Text> : null}
 
-            <ThemedText style={styles.label}>Dirección del restaurante</ThemedText>
-            <View style={[styles.autocompleteWrapper, errors.location && styles.autocompleteError]}>
-              <GooglePlacesAutocomplete
-                ref={placesRef}
-                placeholder="Buscar en Google Maps (selecciona un resultado)"
-                fetchDetails
-                keyboardShouldPersistTaps="handled"
-                onPress={(data, details = null) => {
-                  if (details) {
-                    setAddress(details.formatted_address || data.description);
-                    setLat(String(details.geometry.location.lat));
-                    setLng(String(details.geometry.location.lng));
-                    clearFieldError('location');
-                  }
-                }}
-                onFail={(error) => console.error('Autocomplete Error:', error)}
-                query={{
-                  key: 'AIzaSyDJmyIuXn00Mc1xlF4eVBQcZ5OT-wAsux4',
-                  language: 'es',
-                }}
-                debounce={400}
-                minLength={2}
-                enablePoweredByContainer={false}
-                styles={{
-                  textInput: errors.location ? [styles.input, styles.inputError] : styles.input,
-                  listView: {
-                    backgroundColor: '#FFF',
-                    borderRadius: 12,
-                    borderWidth: 1,
-                    borderColor: '#eee',
-                    marginTop: 5,
-                    elevation: 5,
-                    zIndex: 1000,
-                    maxHeight: 200,
-                  },
-                  row: { padding: 13, height: 44, flexDirection: 'row' },
-                  separator: { height: 0.5, backgroundColor: '#eee' },
-                }}
-              />
+            <View style={styles.placesFieldContainer}>
+              <ThemedText type='title' style={styles.placesFieldTitle}>Dirección del restaurante</ThemedText>
+              <View style={[styles.autocompleteWrapper, errors.location && styles.autocompleteError]}>
+                <GooglePlacesAutocomplete
+                  ref={placesRef}
+                  placeholder="Buscar en Google Maps (selecciona un resultado)"
+                  fetchDetails
+                  keyboardShouldPersistTaps="handled"
+                  textInputProps={{ placeholderTextColor: '#000' }}
+                  onPress={(data, details = null) => {
+                    if (details) {
+                      setAddress(details.formatted_address || data.description);
+                      setLat(String(details.geometry.location.lat));
+                      setLng(String(details.geometry.location.lng));
+                      clearFieldError('location');
+                    }
+                  }}
+                  onFail={(error) => console.error('Autocomplete Error:', error)}
+                  query={{
+                    key: 'AIzaSyDJmyIuXn00Mc1xlF4eVBQcZ5OT-wAsux4',
+                    language: 'es',
+                  }}
+                  debounce={400}
+                  minLength={2}
+                  enablePoweredByContainer={false}
+                  styles={{
+                    container: { flex: 0 },
+                    textInputContainer: { paddingHorizontal: 0 },
+                    textInput: [
+                      styles.placesFieldInput,
+                      errors.location && styles.inputError,
+                    ],
+                    listView: {
+                      backgroundColor: '#FFF',
+                      borderRadius: 12,
+                      borderWidth: 1,
+                      borderColor: '#eee',
+                      marginTop: 8,
+                      elevation: 5,
+                      zIndex: 1000,
+                      maxHeight: 200,
+                    },
+                    row: { padding: 13, height: 44, flexDirection: 'row' },
+                    separator: { height: 0.5, backgroundColor: '#eee' },
+                  }}
+                />
+              </View>
             </View>
             {errors.location ? <Text style={styles.fieldError}>{errors.location}</Text> : null}
 
             <View style={styles.formSection}>
-              <ThemedText style={styles.label}>Descripción del restaurante</ThemedText>
+              {/* <ThemedText style={styles.label}>Descripción del restaurante</ThemedText>
               <TextInput
                 style={[styles.input, styles.textArea, errors.description && styles.inputError]}
                 value={description}
                 onChangeText={(t) => { setDescription(t); clearFieldError('description'); }}
                 placeholder="Breve descripción del restaurante"
                 multiline
+              /> */}
+              <TextField
+                title="Descripción del restaurante"
+                value={description}
+                onChangeText={(t) => { setDescription(t); clearFieldError('description'); }}
+                placeholder="Breve descripción del restaurante"
+                multiline
+                style={[styles.input, styles.textArea, errors.description && styles.inputError]}
               />
               {errors.description ? <Text style={styles.fieldError}>{errors.description}</Text> : null}
               {errors.image ? <Text style={styles.fieldError}>{errors.image}</Text> : null}
@@ -326,29 +370,72 @@ const styles = StyleSheet.create({
   scrollContainer: { flexGrow: 1, paddingBottom: 60 },
   container: { padding: 20, paddingBottom: 40 },
   title: { fontSize: 28, fontWeight: 'bold', marginBottom: 20 },
-  formSection: { width: '100%', marginTop: 24, marginBottom: 24 },
+  formSection: { width: '100%', marginBottom: 24 },
   label: { fontSize: 16, fontWeight: '600', marginBottom: 8, marginTop: 12 },
   input: {
-    backgroundColor: '#f8f9fa',
-    borderRadius: 12,
-    padding: 15,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#eee',
-    color: '#000',
+    // backgroundColor: '#f8f9fa',
+    // borderRadius: 12,
+    // padding: 15,
+    // fontSize: 16,
+    // borderWidth: 1,
+    // borderColor: '#eee',
+    // color: '#000',
+    minHeight: 140
   },
   inputError: { borderColor: '#FF3B30', borderWidth: 1.5 },
   fieldError: { color: '#FF3B30', fontSize: 13, marginTop: 4, marginBottom: 4 },
   textArea: { height: 100, textAlignVertical: 'top' },
   autocompleteWrapper: { zIndex: 1000, elevation: 5, marginBottom: 10 },
-  autocompleteError: { borderWidth: 1.5, borderColor: '#FF3B30', borderRadius: 12 },
+  autocompleteError: { borderWidth: 1.5, borderColor: '#FF3B30', borderRadius: 25 },
+  // Google Places field styled to match `TextField`
+  placesFieldContainer: { width: '100%', gap: 12, marginTop: 10 },
+  placesFieldTitle: { fontSize: 24 },
+  placesFieldInput: {
+    fontSize: 24,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: '#000',
+    backgroundColor: 'transparent',
+    color: '#000',
+    fontFamily: 'Robert-R',
+    height: '86%',
+  },
   imageContainerWrapper: { width: '100%', alignItems: 'center', marginBottom: 20 },
-  imageContainer: { width: '80%', height: 150, borderRadius: 10, backgroundColor: '#e5e7eb', overflow: 'hidden' },
+  imageContainer: {
+    width: 204,
+    height: 204,
+    borderRadius: 10,
+    backgroundColor: '#e5e7eb',
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  imagePickButton: { width: '100%', height: '100%' },
   previewImage: { width: '100%', height: '100%', borderRadius: 10 },
   imagePlaceholder: { width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' },
   imagePlaceholderText: { marginTop: 8, color: '#264BEB', fontWeight: '600' },
+  removeImageButton: {
+    position: 'absolute',
+    left: 10,
+    right: 0,
+    bottom: 70,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    borderColor: '#fff',
+    borderWidth: 1,
+    paddingVertical: 12,
+    borderRadius: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '90%',
+  },
+  removeImageText: {
+    fontFamily: 'Robert-B',
+    fontSize: 24,
+    color: '#fff',
+  },
   submitButton: {
-    marginTop: 30,
+    marginTop: 56,
     marginBottom: 20,
     backgroundColor: '#fff',
     borderRadius: 25,
@@ -356,5 +443,10 @@ const styles = StyleSheet.create({
     borderColor: '#000',
     paddingHorizontal: 20,
     paddingVertical: 10,
+  },
+  topLogoContainer: {
+    padding: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

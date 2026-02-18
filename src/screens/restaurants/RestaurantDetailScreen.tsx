@@ -111,7 +111,9 @@ export default function RestaurantDetailScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.heroWrap}>
+
             <Image source={{ uri: restaurant.image }} style={styles.heroImage} />
+
             <View style={styles.heroScrim} pointerEvents="none" />
 
             <View style={styles.heroTopRow}>
@@ -178,7 +180,7 @@ export default function RestaurantDetailScreen() {
               disabled={!rating || !commentText.trim()}
               variant="outline"
               fullWidth={false}
-              style={{ borderRadius: 12, paddingHorizontal: 24, paddingVertical: 8 }}
+              style={{ borderRadius: 12, paddingHorizontal: 30, paddingVertical: 8 }}
             />
           </View>
 
@@ -245,13 +247,13 @@ function ReviewCard({
   return (
     <TouchableOpacity style={styles.reviewCard} onPress={onPress} activeOpacity={0.8}>
       <View style={styles.reviewCardHeader}>
-        <ThemedText style={styles.reviewAuthor}>{displayName}</ThemedText>
+        <ThemedText type='title' style={styles.reviewAuthor}>{displayName}</ThemedText>
 
       </View>
       <View style={styles.reviewStarsRow}>
-        <CustomStarRating rating={review.rating} size={14} />
+        <CustomStarRating rating={review.rating} size={16} />
       </View>
-      {dateStr ? <ThemedText style={styles.reviewDate}>{dateStr}</ThemedText> : null}
+      {/* {dateStr ? <ThemedText style={styles.reviewDate}>{dateStr}</ThemedText> : null} */}
       <ThemedText style={styles.reviewComment}>{displayComment}</ThemedText>
       {isSelected && (
         <View style={styles.reviewActions}>
@@ -344,7 +346,10 @@ function EditReviewForm({
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: {
+    flex: 1,
+    padding: 20
+  },
   centerContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -357,12 +362,14 @@ const styles = StyleSheet.create({
     position: 'relative',
     width: '100%',
     height: 220,
-    backgroundColor: '#eee',
+    borderRadius: 24,
+    overflow: 'hidden',
   },
   heroImage: {
     width: '100%',
     height: 220,
     backgroundColor: '#eee',
+    borderRadius: 24,
   },
   heroScrim: {
     ...StyleSheet.absoluteFillObject,
@@ -401,14 +408,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 14,
   },
-  section: { paddingHorizontal: 16, paddingTop: 20 },
-  description: { fontSize: 15, lineHeight: 22, marginBottom: 8 },
+  section: { paddingTop: 20 },
+  description: { fontSize: 16, lineHeight: 22, marginBottom: 8, fontFamily: 'Robert-R' },
   avgRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   avgText: { fontSize: 15, fontWeight: '600' },
   reviewBox: {
-    marginHorizontal: 16,
+
     marginTop: 24,
-    padding: 16,
+    padding: 12,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: '#e0e0e0',
@@ -429,10 +436,11 @@ const styles = StyleSheet.create({
 
     borderRadius: 12,
     paddingVertical: 10,
-    fontSize: 15,
+    fontSize: 16,
     minHeight: 88,
     textAlignVertical: 'top',
     backgroundColor: '#fff',
+    fontFamily: 'Robert-R',
   },
   submitButton: { width: 'auto', backgroundColor: '#fff', borderWidth: 1, borderColor: '#000', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10 },
   validationError: { color: '#c00', fontSize: 13, marginBottom: 8 },
@@ -441,7 +449,7 @@ const styles = StyleSheet.create({
   reviewCard: {
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#264BEB',
     marginBottom: 8,
   },
   reviewCardHeader: {
@@ -451,9 +459,9 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   reviewStarsRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 6, justifyContent: 'flex-end' },
-  reviewAuthor: { fontSize: 15, fontWeight: '600' },
+  reviewAuthor: { fontSize: 16, fontWeight: '600' },
   reviewDate: { fontSize: 12, color: '#888', marginBottom: 6 },
-  reviewComment: { fontSize: 14, lineHeight: 20, color: '#333', marginBottom: 12 },
+  reviewComment: { fontSize: 16, lineHeight: 20, color: '#333', marginVertical: 12, fontFamily: 'Robert-R' },
   reviewActions: { flexDirection: 'row', gap: 10 },
   reviewActionBtn: { flex: 1 },
   editFormActions: { flexDirection: 'row', gap: 10 },

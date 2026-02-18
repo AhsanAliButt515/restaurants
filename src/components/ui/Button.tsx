@@ -1,11 +1,11 @@
 import React from 'react';
 import {
-    ActivityIndicator,
-    StyleSheet,
-    Text,
-    TextStyle,
-    TouchableOpacity,
-    ViewStyle,
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TextStyle,
+  TouchableOpacity,
+  ViewStyle,
 } from 'react-native';
 
 interface ButtonProps {
@@ -68,7 +68,7 @@ export const Button = ({
     </TouchableOpacity>
   );
 };
-
+const FONT_ROBERT_B = 'Robert-B';
 const styles = StyleSheet.create({
   button: {
     backgroundColor: '#000',
@@ -78,6 +78,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     width: '100%',
     paddingHorizontal: 20,
+    fontFamily: FONT_ROBERT_B,
   },
   buttonAuto: {
     width: 'auto',
@@ -98,8 +99,11 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+    fontFamily: FONT_ROBERT_B,
   },
   buttonTextOutline: {
     color: '#000',
+    fontFamily: FONT_ROBERT_B,
   },
 });
+

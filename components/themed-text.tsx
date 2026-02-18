@@ -8,6 +8,9 @@ export type ThemedTextProps = TextProps & {
   type?: 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link';
 };
 
+const FONT_REGULAR = 'Robert-R';
+const FONT_SEMIBOLD = 'Robert-B';
+
 export function ThemedText({
   style,
   lightColor,
@@ -16,6 +19,7 @@ export function ThemedText({
   ...rest
 }: ThemedTextProps) {
   const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
+  const fontFamily = type === 'defaultSemiBold' || type === 'subtitle' || type === 'title' ? FONT_SEMIBOLD : FONT_REGULAR;
 
   return (
     <Text
@@ -27,6 +31,7 @@ export function ThemedText({
         type === 'subtitle' ? styles.subtitle : undefined,
         type === 'link' ? styles.link : undefined,
         style,
+        { fontFamily },
       ]}
       {...rest}
     />
@@ -41,16 +46,14 @@ const styles = StyleSheet.create({
   defaultSemiBold: {
     fontSize: 16,
     lineHeight: 24,
-    fontWeight: '600',
   },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
+    fontSize: 24,
     lineHeight: 32,
+    fontFamily: FONT_SEMIBOLD,
   },
   subtitle: {
     fontSize: 20,
-    fontWeight: 'bold',
   },
   link: {
     lineHeight: 30,

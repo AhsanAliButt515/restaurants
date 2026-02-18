@@ -35,6 +35,7 @@ export const TextField: React.FC<TextFieldProps> = ({
   titleStyle,
   inputStyle,
   placeholder,
+  multiline = false,
   placeholderTextColor = 'rgba(0,0,0,0.4)',
   placeholderStyle,
   style,
@@ -45,20 +46,22 @@ export const TextField: React.FC<TextFieldProps> = ({
     ...(Array.isArray(containerStyle)
       ? containerStyle
       : containerStyle
-      ? [containerStyle]
-      : []),
+        ? [containerStyle]
+        : []),
   ];
 
   const mergedTitle = [
     styles.title,
     ...(Array.isArray(titleStyle) ? titleStyle : titleStyle ? [titleStyle] : []),
+    styles.fontFamily,
   ];
 
   const mergedInput = [
     styles.input,
-    // Allow caller to override background, fontSize, etc.
+    multiline && styles.multilineInput,
     ...(Array.isArray(style) ? style : style ? [style] : []),
     ...(Array.isArray(inputStyle) ? inputStyle : inputStyle ? [inputStyle] : []),
+    styles.fontFamilyRegular,
   ];
 
   // React Native does not have a direct placeholder style prop,
@@ -76,19 +79,28 @@ export const TextField: React.FC<TextFieldProps> = ({
         style={mergedInput}
         placeholder={placeholder}
         placeholderTextColor={effectivePlaceholderColor}
+        multiline={multiline}
       />
     </View>
   );
 };
+
+const FONT_ROBERT_R = 'Robert-R';
+const FONT_ROBERT_B = 'Robert-B';
 
 const styles = StyleSheet.create({
   container: {
     width: '100%',
     gap: 8,
   },
+  fontFamilyRegular: {
+    fontFamily: FONT_ROBERT_R,
+  },
+  fontFamily: {
+    fontFamily: FONT_ROBERT_B,
+  },
   title: {
     fontSize: 24,
-    fontWeight: '600',
   },
   input: {
     fontSize: 24,
@@ -99,6 +111,10 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     backgroundColor: '#ffffff',
     color: '#000000',
+  },
+  multilineInput: {
+    minHeight: 100,
+    textAlignVertical: 'top',
   },
 });
 
