@@ -8,7 +8,7 @@ import { StarIcon } from '@/utils/svgs';
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import { StatusBar } from 'expo-status-bar';
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -73,11 +73,11 @@ export default function CreateRestaurantScreen() {
 
   const createMutation = useCreateRestaurantMutation();
 
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerShown: viewState === 'form',
-    });
-  }, [navigation, viewState]);
+  // useLayoutEffect(() => {
+  //   navigation.setOptions({
+  //     headerShown: viewState === 'form',
+  //   });
+  // }, [navigation, viewState]);
 
   // Disable VirtualizedList nesting warning (GooglePlacesAutocomplete uses FlatList inside our ScrollView)
   useEffect(() => {
@@ -234,7 +234,7 @@ export default function CreateRestaurantScreen() {
 
         <View style={styles.resultContainer}>
           <View style={styles.logoContainer}>
-            <StarIcon size={48} />
+            <StarIcon size={26} />
           </View>
           <ThemedText type="title" style={styles.resultTitle}>Restaurante guardado</ThemedText>
           <Button
@@ -245,7 +245,7 @@ export default function CreateRestaurantScreen() {
             textStyle={{ color: '#000' }}
           />
           <View style={styles.logoContainer}>
-            <StarIcon size={48} />
+            <StarIcon size={26} />
           </View>
         </View>
 
@@ -260,7 +260,7 @@ export default function CreateRestaurantScreen() {
 
         <View style={styles.resultContainer}>
           <View style={styles.logoContainer}>
-            <StarIcon size={48} />
+            <StarIcon size={26} />
           </View>
           <ThemedText type="title" style={styles.resultTitle}>Ups, algo salió mal</ThemedText>
           {errorMessage ? <Text style={styles.resultSubtitle}>{errorMessage}</Text> : null}
@@ -272,7 +272,7 @@ export default function CreateRestaurantScreen() {
             textStyle={{ color: '#000' }}
           />
           <View style={styles.logoContainer}>
-            <StarIcon size={48} />
+            <StarIcon size={26} />
           </View>
         </View>
       </ThemedView>
@@ -298,7 +298,7 @@ export default function CreateRestaurantScreen() {
               viewState === 'form' && (
                 <View style={styles.topLogoContainer}>
 
-                  <StarIcon size={48} />
+                  <StarIcon size={26} />
                 </View>
               )
 
@@ -331,7 +331,7 @@ export default function CreateRestaurantScreen() {
                     <View style={styles.imagePlaceholder}>
                       <IconSymbol name="plus" size={36} color="#000" />
 
-                      <ThemedText style={styles.imagePlaceholderText}>Añadir imágen</ThemedText>
+                      <ThemedText type='title' style={styles.imagePlaceholderText}>Añadir imágen</ThemedText>
                     </View>
                   )}
                 </TouchableOpacity>
@@ -350,7 +350,7 @@ export default function CreateRestaurantScreen() {
 
 
             <TextField
-              title="Nombre del restaurante"
+              title="Nombre del restaurante:"
               placeholder="Nombre del restaurante"
               value={name}
               onChangeText={(t: string) => { setName(t); clearFieldError('name'); }}
@@ -612,6 +612,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     color: '#000',
     fontWeight: '600',
+    fontSize: 16,
   },
   submitButton: {
     marginTop: 30,
@@ -653,6 +654,7 @@ const styles = StyleSheet.create({
   },
   topLogoContainer: {
     padding: 16,
+    paddingTop: 0,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -664,8 +666,10 @@ const styles = StyleSheet.create({
   imageContainer: {
     width: 204,
     height: 204,
-    borderRadius: 10,
+    borderRadius: 24,
     backgroundColor: '#e5e7eb',
+    borderWidth: 1,
+    borderColor: '#000',
     overflow: 'hidden',
     position: 'relative',
   },

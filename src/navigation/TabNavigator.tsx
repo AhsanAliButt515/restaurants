@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
 import FavoritesScreen from '../screens/favorites/FavoritesScreen';
 import ProfileScreen from '../screens/profile/ProfileScreen';
+import CreateRestaurantScreen from '../screens/restaurants/CreateRestaurantScreen';
 import RestaurantListScreen from '../screens/restaurants/RestaurantListScreen';
 
 const Tab = createBottomTabNavigator();
@@ -26,6 +27,23 @@ export const TabNavigator = () => {
           ),
         }}
       />
+      {/* <Tab.Screen
+        name="Create"
+        component={CreateRestaurantScreen}
+        options={{
+          tabBarButton: () => null,
+          tabBarItemStyle: { display: 'none' },
+        }}
+      /> */}
+      <Tab.Screen
+        name="Create"
+        component={CreateRestaurantScreen}
+        options={{
+          tabBarItemStyle: { display: 'none' },
+          headerShown: false,
+          tabBarIcon: () => null,
+        }}
+      />
       <Tab.Screen
         name="Favorites"
         component={FavoritesScreen}
@@ -47,3 +65,5 @@ export const TabNavigator = () => {
     </Tab.Navigator>
   );
 };
+
+

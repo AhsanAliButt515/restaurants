@@ -107,9 +107,9 @@ export const RootNavigator = () => {
 
   return (
     <AuthContext.Provider value={contextValue}>
-      
-        {isAuthenticated ? <DrawerNavigator /> : <AuthStack />}
-      
+
+      {isAuthenticated ? <DrawerNavigator /> : <AuthStack />}
+
     </AuthContext.Provider>
   );
 };

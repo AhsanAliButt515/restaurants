@@ -217,7 +217,7 @@ export default function EditRestaurantScreen() {
           <ThemedView style={styles.container}>
             <View style={styles.topLogoContainer}>
 
-              <StarIcon size={48} />
+              <StarIcon size={26} />
             </View>
 
             <View style={styles.imageContainerWrapper}>
@@ -242,7 +242,7 @@ export default function EditRestaurantScreen() {
                   ) : (
                     <View style={styles.imagePlaceholder}>
                       <Ionicons name="camera" size={40} color="#264BEB" />
-                      <ThemedText style={styles.imagePlaceholderText}>Subir imagen</ThemedText>
+                      <ThemedText type='title' style={styles.imagePlaceholderText}>Subir imagen</ThemedText>
                     </View>
                   )}
                 </TouchableOpacity>
@@ -261,7 +261,7 @@ export default function EditRestaurantScreen() {
 
 
             <TextField
-              title="Nombre del restaurante"
+              title="Nombre del restaurante:"
               value={name}
               onChangeText={(t) => { setName(t); clearFieldError('name'); }}
               placeholder="Nombre del restaurante"
@@ -406,13 +406,15 @@ const styles = StyleSheet.create({
   imageContainer: {
     width: 204,
     height: 204,
-    borderRadius: 10,
+    borderRadius: 24,
     backgroundColor: '#e5e7eb',
     overflow: 'hidden',
     position: 'relative',
+    borderWidth: 1,
+    borderColor: '#000',
   },
   imagePickButton: { width: '100%', height: '100%' },
-  previewImage: { width: '100%', height: '100%', borderRadius: 10 },
+  previewImage: { width: '100%', height: '100%', borderRadius: 24 },
   imagePlaceholder: { width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' },
   imagePlaceholderText: { marginTop: 8, color: '#264BEB', fontWeight: '600' },
   removeImageButton: {
@@ -446,6 +448,7 @@ const styles = StyleSheet.create({
   },
   topLogoContainer: {
     padding: 16,
+    paddingTop: 0,
     justifyContent: 'center',
     alignItems: 'center',
   },

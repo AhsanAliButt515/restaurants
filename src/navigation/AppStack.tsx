@@ -11,7 +11,7 @@ const Stack = createNativeStackNavigator();
 export const AppStack = () => {
   return (
     <View style={styles.container}>
-      <Stack.Navigator initialRouteName="MainTabs">
+      <Stack.Navigator initialRouteName="MainTabs" screenOptions={{ headerShown: false }}>
         <Stack.Screen name="MainTabs" component={TabNavigator} options={{ headerShown: false }} />
         <Stack.Screen name="RestaurantDetail" component={RestaurantDetailScreen} options={{ title: 'Restaurant Details' }} />
         <Stack.Screen name="EditRestaurant" component={EditRestaurantScreen} options={{ title: 'Actualizar restaurante' }} />
