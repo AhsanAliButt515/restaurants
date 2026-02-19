@@ -1,7 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { DrawerButton } from '../components/DrawerButton';
 import EditRestaurantScreen from '../screens/restaurants/EditRestaurantScreen';
 import RestaurantDetailScreen from '../screens/restaurants/RestaurantDetailScreen';
 import { TabNavigator } from './TabNavigator';
@@ -16,7 +15,6 @@ export const AppStack = () => {
         <Stack.Screen name="RestaurantDetail" component={RestaurantDetailScreen} options={{ title: 'Restaurant Details' }} />
         <Stack.Screen name="EditRestaurant" component={EditRestaurantScreen} options={{ title: 'Actualizar restaurante' }} />
       </Stack.Navigator>
-      <DrawerButton />
     </View>
   );
 };

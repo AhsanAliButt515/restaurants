@@ -1,5 +1,5 @@
 import { ThemedView } from '@/components/themed-view';
-import { Colors } from '@/constants/theme';
+import { Colors, Space } from '@/constants/theme';
 import Logo from '@/utils/svgs';
 import React, { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -32,7 +32,7 @@ export default function SplashScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: Space.md,
   },
   logoContainer: {
     backgroundColor: Colors.light.splash,
@@ -40,5 +40,6 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
+    padding: Space.xxl,
   },
 });

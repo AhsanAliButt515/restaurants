@@ -14,6 +14,7 @@ import {
   View,
 } from "react-native";
 
+import { Colors, Space } from "@/constants/theme";
 import { getUser } from "@/storage/auth";
 import { EditIcon } from "@/utils/svgs";
 import { Button } from "../../components/ui/Button";
@@ -119,7 +120,7 @@ export default function ProfileScreen() {
             ref={dniRef}
             style={styles.input}
             placeholder="03967380Q"
-            placeholderTextColor="#000"
+            placeholderTextColor={Colors.light.black}
             value={dni}
             onChangeText={setDni}
             editable={editableField === "dni"}
@@ -223,13 +224,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    padding: 20,
+    paddingTop: Space.xxl,
+    paddingHorizontal: Space.md,
+    paddingBottom: Space.md
   },
   avatarContainer: {
-    width: 140,
-    height: 140,
+    width: 136,
+    height: 136,
     borderRadius: 70,
-    backgroundColor: "#e5e7eb",
+    backgroundColor: Colors.light.grey,
     alignItems: "center",
     justifyContent: "center",
     overflow: "hidden",
@@ -252,7 +255,7 @@ const styles = StyleSheet.create({
     paddingRight: 32, // space for edit icon
     marginVertical: 2,
     borderBottomWidth: 1,
-    borderBottomColor: "#000",
+    borderBottomColor: Colors.light.black,
   },
   label: {
     color: "#000",

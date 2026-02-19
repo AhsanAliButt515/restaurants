@@ -3,10 +3,12 @@ import { useDeleteRestaurantMutation, useRestaurantsQuery } from '@/api/restaura
 import { RestaurantCard } from '@/components/RestaurantCard';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { Colors, Space } from '@/constants/theme';
 import { useFavorites } from '@/hooks/useFavorites';
 import { MapIcon } from '@/utils/svgs';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import React, { useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Animated, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { RectButton, Swipeable } from 'react-native-gesture-handler';
@@ -33,6 +35,7 @@ const DARK_MAP_STYLE = [
 ];
 
 export default function RestaurantListScreen() {
+  const insets = useSafeAreaInsets();
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [page, setPage] = useState(1);
   const [selectedMarkerId, setSelectedMarkerId] = useState<string | null>(null);
@@ -154,7 +157,7 @@ export default function RestaurantListScreen() {
   );
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView style={[styles.container, viewMode === 'map' && { overflow: 'visible' }]}>
       {/* Header */}
       <View style={styles.header}>
         <ThemedText type="title" style={styles.title}>{viewMode === 'map' ? 'Mapa' : 'Restaurantes'}</ThemedText>
@@ -170,7 +173,7 @@ export default function RestaurantListScreen() {
       </View>
 
       {/* Content Area */}
-      <View style={styles.content}>
+      <View style={[styles.content, viewMode === 'map' && { overflow: 'visible' }]}>
         {viewMode === 'list' ? (
           <View style={styles.contentList}>
             <FlatList
@@ -183,7 +186,7 @@ export default function RestaurantListScreen() {
             />
           </View>
         ) : (
-          <View style={styles.mapContainer}>
+          <View style={[styles.mapContainer, { marginLeft: -insets.left, marginRight: -insets.right }]}>
             <MapView
               style={StyleSheet.absoluteFill}
               provider={PROVIDER_GOOGLE}
@@ -304,10 +307,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentList: {
-    paddingHorizontal: 16,
+    paddingHorizontal: Space.md,
   },
   contentMap: {
-    paddingHorizontal: 16,
+    paddingHorizontal: Space.md,
   },
   centerContainer: {
     flex: 1,
@@ -325,11 +328,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingBottom: 15,
     paddingHorizontal: 16,
+    paddingTop: Space.lg
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#000',
+    color: Colors.light.black,
   },
   headerActions: {
     flexDirection: 'row',
@@ -350,7 +354,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   swipeActionEdit: {
-    backgroundColor: '#264BEB',
+    backgroundColor: Colors.light.tailorBlue,
   },
   swipeActionDelete: {
     backgroundColor: '#E53935',
@@ -364,12 +368,9 @@ const styles = StyleSheet.create({
   mapContainer: {
     flex: 1,
     width: '100%',
-    borderRadius: 20,
     overflow: 'hidden',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: Colors.light.white,
     marginBottom: 10,
-    borderWidth: 1,
-    borderColor: '#eee',
     minHeight: 300,
     position: 'relative',
   },
@@ -413,7 +414,7 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
   },
   pagination: {
-    paddingVertical: 24,
+    paddingVertical: Space.lg,
     paddingHorizontal: 8,
     alignItems: 'center',
     borderTopWidth: 1,
@@ -447,7 +448,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   pageNumTextActive: {
-    color: '#fff',
+    color: Colors.light.white,
     fontWeight: '600',
   },
 });

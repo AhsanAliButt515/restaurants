@@ -1,11 +1,12 @@
+import { Colors } from '@/constants/theme';
 import React from 'react';
 import {
-    ActivityIndicator,
-    StyleSheet,
-    Text,
-    TextStyle,
-    TouchableOpacity,
-    ViewStyle,
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TextStyle,
+  TouchableOpacity,
+  ViewStyle,
 } from 'react-native';
 
 interface ButtonProps {
@@ -14,6 +15,7 @@ interface ButtonProps {
   loading?: boolean;
   disabled?: boolean;
   variant?: 'primary' | 'secondary' | 'outline';
+  fullWidth?: boolean;
   style?: ViewStyle | ViewStyle[];
   textStyle?: TextStyle | TextStyle[];
   testID?: string;
@@ -25,6 +27,7 @@ export const Button = ({
   loading = false,
   disabled = false,
   variant = 'primary',
+  fullWidth = true,
   style,
   textStyle,
   testID,
@@ -34,6 +37,7 @@ export const Button = ({
 
   const containerStyles = [
     styles.button,
+    !fullWidth && styles.buttonFitContent,
     isSecondary && styles.buttonSecondary,
     isOutline && styles.buttonOutline,
     ...(Array.isArray(style) ? style : style ? [style] : []),
@@ -67,13 +71,17 @@ export const Button = ({
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#000',
+    backgroundColor: Colors.light.black,
     height: 52,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 25,
     width: '100%',
     paddingHorizontal: 20,
+  },
+  buttonFitContent: {
+    width: undefined,
+    alignSelf: 'flex-start',
   },
   buttonSecondary: {
     backgroundColor: '#264BEB',
@@ -87,7 +95,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   buttonText: {
-    color: '#fff',
+    color: Colors.light.white,
     fontSize: 16,
     fontWeight: 'bold',
   },

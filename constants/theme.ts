@@ -3,7 +3,7 @@
  * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
  */
 
- 
+
 import { AppColors } from '@/types/theme';
 import { Platform } from 'react-native';
 
@@ -16,6 +16,10 @@ export const Colors: AppColors = {
     background: '#fff',
     inputBorder: '#fff',
     tint: tintColorLight,
+    tailorBlue: '#264BEB',
+    white: '#FFFFFF',
+    black: '#0B0B0B',
+    grey: '#F1F1F0',
     splash: '#F1F1F0',
     icon: '#687076',
     tabIconDefault: '#687076',
@@ -32,6 +36,10 @@ export const Colors: AppColors = {
   dark: {
     text: '#ECEDEE',
     background: '#151718',
+    tailorBlue: '#0A84FF',
+    white: '#FFFFFF',
+    black: '#0B0B0B',
+    grey: '#F1F1F0',
     inputBorder: '#fff',
     tint: tintColorDark,
     splash: '#151718',
@@ -47,6 +55,20 @@ export const Colors: AppColors = {
     card: '#1C1C1E',
     notification: '#FF453A',
   },
+};
+
+
+export const Space = {
+  xs: 0,
+  s: 8,
+  md: 16,
+  lg: 24,
+  xl: 32,
+  xxl: 40,
+};
+
+export const CornorRadius = {
+  CornorRadius: 24
 };
 
 export const Fonts = Platform.select({

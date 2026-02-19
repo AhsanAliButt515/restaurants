@@ -9,6 +9,7 @@ import { CustomStarRating } from '@/components/CustomStarRating';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Button } from '@/components/ui/Button';
+import { Colors, CornorRadius, Space } from '@/constants/theme';
 import { useFavorites } from '@/hooks/useFavorites';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -36,7 +37,10 @@ export default function RestaurantDetailScreen() {
 
   const [rating, setRating] = useState(0);
   const [commentText, setCommentText] = useState('');
+  const [ratingError, setRatingError] = useState<string | null>(null);
+  const [commentError, setCommentError] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [selectedReviewId, setSelectedReviewId] = useState<string | null>(null);
   const [editingReview, setEditingReview] = useState<Comment | null>(null);
 
@@ -46,26 +50,40 @@ export default function RestaurantDetailScreen() {
   }, [navigation]);
 
   const handleSubmitReview = () => {
+    setRatingError(null);
+    setCommentError(null);
     setValidationError(null);
     const comment = commentText.trim();
-    if (rating < 1 || rating > 5) {
-      setValidationError('Selecciona una valoración de 1 a 5 estrellas.');
-      return;
+    
+    let hasError = false;
+    
+    if (!rating || rating < 1 || rating > 5) {
+      setRatingError('Por favor selecciona una valoración de 1 a 5 estrellas.');
+      hasError = true;
     }
+    
     if (comment.length < 10) {
-      setValidationError('El comentario debe tener al menos 10 caracteres.');
+      setCommentError('El comentario debe tener al menos 10 caracteres.');
+      hasError = true;
+    } else if (comment.length > 255) {
+      setCommentError('El comentario no puede superar 255 caracteres.');
+      hasError = true;
+    }
+    
+    if (hasError) {
       return;
     }
-    if (comment.length > 255) {
-      setValidationError('El comentario no puede superar 255 caracteres.');
-      return;
-    }
+    
     createComment.mutate(
       { comment, rating },
       {
         onSuccess: () => {
           setRating(0);
           setCommentText('');
+          setRatingError(null);
+          setCommentError(null);
+          setValidationError(null);
+          setSuccessMessage('Reseña enviada correctamente.');
         },
         onError: (err: any) => {
           setValidationError(
@@ -156,8 +174,19 @@ export default function RestaurantDetailScreen() {
           <View style={styles.reviewBox}>
 
             <View style={styles.starsRow}>
-              <CustomStarRating rating={rating} size={24} onRatingChange={setRating} />
+              <CustomStarRating 
+                rating={rating} 
+                size={24} 
+                onRatingChange={(newRating) => {
+                  setRating(newRating);
+                  if (ratingError) setRatingError(null);
+                  if (successMessage) setSuccessMessage(null);
+                }} 
+              />
             </View>
+            {ratingError ? (
+              <ThemedText style={styles.validationError}>{ratingError}</ThemedText>
+            ) : null}
             <TextInput
               style={styles.commentInput}
               placeholder="Escribe tu comentario sobre el restaurante"
@@ -165,22 +194,28 @@ export default function RestaurantDetailScreen() {
               value={commentText}
               onChangeText={(t) => {
                 setCommentText(t);
+                if (commentError) setCommentError(null);
                 if (validationError) setValidationError(null);
+                if (successMessage) setSuccessMessage(null);
               }}
               multiline
               numberOfLines={3}
             />
+            {commentError ? (
+              <ThemedText style={styles.validationError}>{commentError}</ThemedText>
+            ) : null}
             {validationError ? (
               <ThemedText style={styles.validationError}>{validationError}</ThemedText>
+            ) : null}
+            {successMessage ? (
+              <ThemedText style={styles.successMessage}>{successMessage}</ThemedText>
             ) : null}
             <Button
               title="Enviar"
               onPress={handleSubmitReview}
               loading={createComment.isPending}
-              disabled={!rating || !commentText.trim()}
               variant="outline"
-              fullWidth={false}
-              style={{ borderRadius: 12, paddingHorizontal: 30, paddingVertical: 8 }}
+              style={styles.submitBtton}
             />
           </View>
 
@@ -285,23 +320,35 @@ function EditReviewForm({
   const updateComment = useUpdateCommentMutation(restaurantId, review._id);
   const [rating, setRating] = useState(review.rating);
   const [comment, setComment] = useState((review.comment ?? review.text) ?? '');
+  const [ratingError, setRatingError] = useState<string | null>(null);
+  const [commentError, setCommentError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-
+  console.log('EditReviewForm render', { review, rating, comment });
   const handleUpdate = () => {
+    setRatingError(null);
+    setCommentError(null);
     setError(null);
     const trimmedComment = comment.trim();
-    if (rating < 1 || rating > 5) {
-      setError('Selecciona una valoración de 1 a 5 estrellas.');
-      return;
+    
+    let hasError = false;
+    
+    if (!rating || rating < 1 || rating > 5) {
+      setRatingError('Por favor selecciona una valoración de 1 a 5 estrellas.');
+      hasError = true;
     }
+    
     if (trimmedComment.length < 10) {
-      setError('El comentario debe tener al menos 10 caracteres.');
+      setCommentError('El comentario debe tener al menos 10 caracteres.');
+      hasError = true;
+    } else if (trimmedComment.length > 255) {
+      setCommentError('El comentario no puede superar 255 caracteres.');
+      hasError = true;
+    }
+    
+    if (hasError) {
       return;
     }
-    if (trimmedComment.length > 255) {
-      setError('El comentario no puede superar 255 caracteres.');
-      return;
-    }
+    
     updateComment.mutate(
       { rating, comment: trimmedComment },
       {
@@ -320,22 +367,35 @@ function EditReviewForm({
     <View style={styles.reviewBox}>
       <ThemedText style={styles.reviewBoxTitle}>Editar reseña</ThemedText>
       <View style={styles.reviewStarsRow}>
-        <CustomStarRating rating={rating} size={24} onRatingChange={setRating} />
+        <CustomStarRating 
+          rating={rating} 
+          size={24} 
+          onRatingChange={(newRating) => {
+            setRating(newRating);
+            if (ratingError) setRatingError(null);
+          }} 
+        />
       </View>
+      {ratingError ? <ThemedText style={styles.validationError}>{ratingError}</ThemedText> : null}
       <TextInput
         style={styles.commentInput}
         placeholder="Comentario (10-255 caracteres)"
         placeholderTextColor="#999"
         value={comment}
-        onChangeText={(t) => { setComment(t); if (error) setError(null); }}
+        onChangeText={(t) => { 
+          setComment(t); 
+          if (commentError) setCommentError(null);
+          if (error) setError(null); 
+        }}
         multiline
         numberOfLines={3}
       />
+      {commentError ? <ThemedText style={styles.validationError}>{commentError}</ThemedText> : null}
       {error ? <ThemedText style={styles.validationError}>{error}</ThemedText> : null}
       <View style={styles.editFormActions}>
         <Button title="Cancelar" variant="outline" onPress={onClose} style={styles.editFormBtn} />
         <Button
-          title="Actualizar comentario"
+          title="Actualizar"
           onPress={handleUpdate}
           loading={updateComment.isPending}
           style={styles.editFormBtn}
@@ -348,7 +408,7 @@ function EditReviewForm({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20
+    padding: Space.md
   },
   centerContainer: {
     flex: 1,
@@ -369,7 +429,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 220,
     backgroundColor: '#eee',
-    borderRadius: 24,
+    borderRadius: CornorRadius.CornorRadius,
   },
   heroScrim: {
     ...StyleSheet.absoluteFillObject,
@@ -414,7 +474,7 @@ const styles = StyleSheet.create({
   avgText: { fontSize: 15, fontWeight: '600' },
   reviewBox: {
 
-    marginTop: 24,
+    marginVertical: 24,
     padding: 12,
     borderRadius: 16,
     borderWidth: 1,
@@ -444,6 +504,7 @@ const styles = StyleSheet.create({
   },
   submitButton: { width: 'auto', backgroundColor: '#fff', borderWidth: 1, borderColor: '#000', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10 },
   validationError: { color: '#c00', fontSize: 13, marginBottom: 8 },
+  successMessage: { color: Colors.light.success, fontSize: 14, marginBottom: 8, fontWeight: '500' },
   reviewsSectionTitle: { marginBottom: 12 },
   noReviews: { fontSize: 14, color: '#888' },
   reviewCard: {
@@ -466,4 +527,8 @@ const styles = StyleSheet.create({
   reviewActionBtn: { flex: 1 },
   editFormActions: { flexDirection: 'row', gap: 10 },
   editFormBtn: { flex: 1 },
+  submitBtton: {
+    alignSelf: 'flex-start',
+    borderRadius: 12, paddingHorizontal: 30, paddingVertical: 8, width: 'auto'
+  }
 });

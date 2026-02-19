@@ -4,8 +4,8 @@ import { StyleSheet } from 'react-native';
 import { useVerifyQuery } from '../api/auth';
 import api from '../api/client';
 import SplashScreen from '../screens/SplashScreen';
+import { AppStack } from './AppStack';
 import { AuthStack } from './AuthStack';
-import { DrawerNavigator } from './DrawerNavigator';
 
 interface AuthContextType {
   checkAuth: () => Promise<void>;
@@ -108,7 +108,7 @@ export const RootNavigator = () => {
   return (
     <AuthContext.Provider value={contextValue}>
 
-      {isAuthenticated ? <DrawerNavigator /> : <AuthStack />}
+      {isAuthenticated ? <AppStack /> : <AuthStack />}
 
     </AuthContext.Provider>
   );

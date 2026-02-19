@@ -1,8 +1,9 @@
 import { RestaurantCard } from '@/components/RestaurantCard';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { useFocusEffect } from '@react-navigation/native';
+import { Space } from '@/constants/theme';
 import { useFavorites } from '@/hooks/useFavorites';
+import { useFocusEffect } from '@react-navigation/native';
 import React, { useCallback, useMemo } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
 
@@ -66,7 +67,7 @@ export default function FavoritesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 10,
+    paddingHorizontal: Space.md,
   },
   centerContainer: {
     flex: 1,
@@ -77,7 +78,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    paddingTop: Space.lg,
+    paddingBottom: Space.md
   },
   title: {
     fontSize: 24,

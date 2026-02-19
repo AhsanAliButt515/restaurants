@@ -15,6 +15,10 @@ export interface ColorTheme {
   card: string;
   notification: string;
   inputBorder: string;
+  tailorBlue: string;
+  white: string;
+  black: string;
+  grey: string;
 }
 
 export type ThemeType = 'light' | 'dark';

@@ -1,12 +1,11 @@
 import { useLoginMutation, useSignupMutation } from '@/api/auth';
 import { TextField } from '@/components/ui/TextField';
-import { Colors } from '@/constants/theme';
+import { Colors, CornorRadius, Space } from '@/constants/theme';
 import { saveAccess, saveToken, saveUser } from '@/storage/auth';
 import { BackArrow, BlueLogo } from '@/utils/svgs';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
-    Alert,
     Animated,
     Easing,
     KeyboardAvoidingView,
@@ -38,6 +37,7 @@ export default function LoginScreen() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
     const validEmail = useMemo(() => /.+@.+\..+/, []);
     // ===== Animations =====
     const slideAnim = useRef(new Animated.Value(120)).current;
@@ -131,11 +131,12 @@ export default function LoginScreen() {
                 name: username
             });
             console.log('Signup Response:', response);
-            Alert.alert(JSON.stringify(response));
-            navigation.reset({
-                index: 0,
-                routes: [{ name: 'Login' as never }],
-            });
+            setSuccess('Cuenta creada correctamente. Ya puedes iniciar sesión.');
+            setError('');
+            setMode('login');
+            setEmail('');
+            setUsername('');
+            setPassword('');
 
 
 
@@ -208,11 +209,12 @@ export default function LoginScreen() {
                         {mode === 'login' ? (
                             // === LOGIN MODE: keep current layout ===
                             <View style={styles.form}>
+                                {success ? <Text style={styles.success}>{success}</Text> : null}
                                 <TextField
                                     title="Email"
                                     placeholder="Escribe tu email"
                                     value={email}
-                                    onChangeText={setEmail}
+                                    onChangeText={(t) => { setEmail(t); if (success) setSuccess(''); }}
                                     titleStyle={{ fontSize: 24, color: '#fff' }}
                                     inputStyle={{
                                         backgroundColor: 'transparent',
@@ -225,7 +227,7 @@ export default function LoginScreen() {
                                     title="Contraseña"
                                     placeholder="Esccribe tu nombre"
                                     value={password}
-                                    onChangeText={setPassword}
+                                    onChangeText={(t) => { setPassword(t); if (success) setSuccess(''); }}
                                     titleStyle={{ fontSize: 24, color: '#fff' }}
                                     inputStyle={{
                                         backgroundColor: 'transparent',
@@ -251,6 +253,7 @@ export default function LoginScreen() {
                                     onPress={() => {
                                         setMode('register-info');
                                         setError('');
+                                        setSuccess('');
                                         setEmail('');
                                         setUsername('');
                                         setPassword('');
@@ -277,11 +280,11 @@ export default function LoginScreen() {
                                                 placeholder="Añade tu email"
                                                 value={email}
                                                 onChangeText={setEmail}
-                                                titleStyle={{ fontSize: 24, color: '#fff' }}
+                                                titleStyle={{ fontSize: 24, color: Colors.light.white }}
                                                 inputStyle={{
                                                     backgroundColor: 'transparent',
                                                     borderColor: Colors.light.inputBorder,
-                                                    color: '#fff',
+                                                    color: Colors.light.white,
                                                 }}
                                                 placeholderTextColor="rgba(255,255,255,0.6)"
                                             />
@@ -295,7 +298,7 @@ export default function LoginScreen() {
                                                 inputStyle={{
                                                     backgroundColor: 'transparent',
                                                     borderColor: Colors.light.inputBorder,
-                                                    color: '#fff',
+                                                    color: Colors.light.white,
                                                 }}
                                                 placeholderTextColor="rgba(255,255,255,0.6)"
                                             />
@@ -305,7 +308,7 @@ export default function LoginScreen() {
                                                 title="Continuar"
                                                 variant="secondary"
                                                 textStyle={{
-                                                    color: '#000'
+                                                    color: Colors.light.black
                                                 }}
                                                 style={styles.authButton}
                                                 onPress={handleRegisterInfo}
@@ -320,11 +323,11 @@ export default function LoginScreen() {
                                                 placeholder="Nueva contraseña"
                                                 value={password}
                                                 onChangeText={setPassword}
-                                                titleStyle={{ fontSize: 24, color: '#fff' }}
+                                                titleStyle={{ fontSize: 24, color: Colors.light.white }}
                                                 inputStyle={{
                                                     backgroundColor: 'transparent',
                                                     borderColor: Colors.light.inputBorder,
-                                                    color: '#fff',
+                                                    color: Colors.light.white,
                                                 }}
                                                 placeholderTextColor="rgba(255,255,255,0.6)"
                                             />
@@ -334,7 +337,7 @@ export default function LoginScreen() {
                                                 disabled={signupMutation.isPending}
                                                 variant="secondary"
                                                 textStyle={{
-                                                    color: '#000'
+                                                    color: Colors.light.black
                                                 }}
                                                 style={styles.authButton}
                                                 onPress={handleSignup}
@@ -365,12 +368,12 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         minHeight: 400,
-        backgroundColor: '#FFFFFF',
-        padding: 16,
+        backgroundColor: Colors.light.white,
+        padding: Space.md,
     },
     logoWrapper: {
         flex: 1,
-        marginTop: 10,
+        padding: Space.lg,
         alignItems: 'center',
     },
     logo: {
@@ -379,23 +382,23 @@ const styles = StyleSheet.create({
         resizeMode: 'contain',
     },
     backButton: {
-        paddingHorizontal: 32,
-        paddingVertical: 14,
-        borderColor: '#fff',
+        paddingHorizontal: Space.lg,
+        paddingVertical: Space.md,
+        borderColor: Colors.light.white,
         borderWidth: 1,
-        borderRadius: 24,
+        borderRadius: CornorRadius.CornorRadius,
         alignItems: 'center',
         justifyContent: 'center',
         alignSelf: 'flex-start',
         marginBottom: 24,
-        width: 100,
+        height: 44,
+        gap: 8
     },
     bottomContainer: {
-        backgroundColor: '#264BEB',
-        borderRadius: 30,
-        paddingHorizontal: 30,
-        paddingTop: 40,
-        paddingBottom: Platform.OS === 'ios' ? 40 : 30,
+        backgroundColor: Colors.light.tailorBlue,
+        borderRadius: Space.lg,
+        paddingHorizontal: Space.lg,
+        paddingVertical: Space.md,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: -4 },
         shadowOpacity: 0.1,
@@ -417,36 +420,43 @@ const styles = StyleSheet.create({
     input: {
         backgroundColor: 'rgba(0,0,0,0)',
         height: 44,
-        paddingHorizontal: 16,
         borderWidth: 1,
         borderColor: Colors.light.inputBorder,
-        borderRadius: 25,
+        borderRadius: Space.lg,
         fontSize: 16,
-        color: '#ffffff',
+    },
+    inputTextColor: {
+        color: Colors.light.white
     },
     label: {
-        color: "#fff",
+        color: Colors.light.white,
         fontSize: 24,
         marginBottom: -5,
         fontWeight: '600',
     },
 
     error: {
-        color: "#ff6b6b",
+        color: Colors.light.error,
         marginTop: 6,
         textAlign: 'center',
-
+    },
+    success: {
+        color: Colors.light.success,
+        marginTop: 6,
+        marginBottom: 4,
+        textAlign: 'center',
+        fontSize: 15,
     },
 
     authButton: {
 
-        backgroundColor: '#FFFFFF',
+        backgroundColor: Colors.light.white,
         fontSize: 16,
-        borderRadius: 16,
+        borderRadius: 17,
         fontWeight: '600',
         paddingVertical: 12,
 
-        paddingHorizontal: 12,
+        paddingHorizontal: Space.lg,
 
         alignItems: 'center',
 
@@ -457,7 +467,7 @@ const styles = StyleSheet.create({
     },
 
     linkText: {
-        color: '#fff',
+        color: Colors.light.white,
         fontSize: 16,
         marginTop: 10,
 

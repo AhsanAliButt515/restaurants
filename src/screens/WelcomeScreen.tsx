@@ -1,6 +1,6 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Colors } from '@/constants/theme';
+import { Colors, CornorRadius, Space } from '@/constants/theme';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 // import Logo from "../../assets/images/logo.svg";
@@ -39,29 +39,30 @@ export default function WelcomeScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: Space.md,
   },
   logoContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Colors.light.splash,
+    backgroundColor: Colors.light.grey,
     flex: 1,
-    borderRadius: 24,
+    borderRadius: Space.lg,
+    padding: '10%',
   },
   subtitle: {
     textAlign: 'center',
-    marginTop: 20,
+    marginTop: 28,
     fontSize: 24,
-    paddingHorizontal: '8%',
-    fontFamily: 'Robert-B',
+    fontFamily: 'Robert-R',
+    color: Colors.light.black,
   },
   welcomeButton: {
     marginTop: 24,
-    width: '85%',
-    borderRadius: 20,
+    width: '100%',
+    borderRadius: CornorRadius.CornorRadius,
   },
   buttonText: {
-    color: Colors.light.text,
+    color: Colors.light.black,
     fontSize: 16,
     fontWeight: 'bold',
   },

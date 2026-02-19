@@ -1,5 +1,6 @@
 import { Restaurant } from '@/api/restaurants';
 import { ThemedText } from '@/components/themed-text';
+import { Colors, Space } from '@/constants/theme';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
@@ -56,6 +57,14 @@ export const RestaurantCard = ({ data, isFavorite, hideComments, variant = 'defa
   const displayAddress = data.address?.trim() || resolvedAddress || null;
   const isMapVariant = variant === 'map';
 
+  // Truncate address to 30 characters
+  const truncateAddress = (address: string): string => {
+    if (address.length <= 30) return address;
+    return address.substring(0, 30) + '...';
+  };
+
+  const truncatedAddress = displayAddress ? truncateAddress(displayAddress) : null;
+
   return (
     <View style={[styles.container, isMapVariant && styles.containerMap, containerStyle]}>
       <View style={[styles.card, isMapVariant && styles.cardMap, cardStyle]}>
@@ -69,8 +78,8 @@ export const RestaurantCard = ({ data, isFavorite, hideComments, variant = 'defa
           <View style={[styles.info, isMapVariant && styles.infoMap]}>
 
             <ThemedText style={styles.name} type="defaultSemiBold">{data.name}</ThemedText>
-            {displayAddress ? (
-              <ThemedText style={styles.description} >{displayAddress}</ThemedText>
+            {truncatedAddress ? (
+              <ThemedText style={styles.description} >{truncatedAddress}</ThemedText>
             ) : null}
 
 
@@ -114,8 +123,8 @@ const styles = StyleSheet.create({
   },
   card: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
-    borderRadius: 16,
+    backgroundColor: Colors.light.white,
+    borderRadius: 20,
     overflow: 'hidden',
     elevation: 3,
     shadowColor: '#000',
@@ -128,7 +137,7 @@ const styles = StyleSheet.create({
     // add internal padding so content doesn't touch the border (map variant)
     borderRadius: 12,
     height: 84,
-    padding: 8,
+    padding: Space.s,
   },
   cardContent: {
     flex: 1,
@@ -181,7 +190,7 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 14,
-    color: '#0B0B0B',
+    color: Colors.light.black,
     marginVertical: 2,
     fontFamily: 'Robert-R',
   },

@@ -1,3 +1,4 @@
+import { Colors, Space } from '@/constants/theme';
 import React from 'react';
 import {
   StyleSheet,
@@ -104,13 +105,13 @@ const styles = StyleSheet.create({
   },
   input: {
     fontSize: 24,
-    paddingHorizontal: 16,
+    paddingHorizontal: Space.md,
     paddingVertical: 10,
     borderRadius: 25,
     borderWidth: 1,
     borderColor: '#ccc',
     backgroundColor: '#ffffff',
-    color: '#000000',
+    color: Colors.light.black,
   },
   multilineInput: {
     minHeight: 100,

@@ -4,10 +4,10 @@ import { ThemedView } from '@/components/themed-view';
 import { Button } from '@/components/ui/Button';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { TextField } from '@/components/ui/TextField';
+import { Colors, Space } from '@/constants/theme';
 import { StarIcon } from '@/utils/svgs';
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
-import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -58,7 +58,6 @@ export default function CreateRestaurantScreen() {
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
   const [image, setImage] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState('');
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -201,7 +200,7 @@ export default function CreateRestaurantScreen() {
 
   const goToRestaurantList = () => {
     setViewState('form');
-    (navigation as any).navigate('AppContent');
+    (navigation as any).navigate('MainTabs', { screen: 'Restaurants' });
   };
 
   const goBackToForm = () => {
@@ -242,7 +241,7 @@ export default function CreateRestaurantScreen() {
             variant="secondary"
             onPress={goToRestaurantList}
             style={styles.submitButton}
-            textStyle={{ color: '#000' }}
+            textStyle={{ color: Colors.light.black }}
           />
           <View style={styles.logoContainer}>
             <StarIcon size={26} />
@@ -256,7 +255,7 @@ export default function CreateRestaurantScreen() {
   if (viewState === 'error') {
     return (
       <ThemedView style={styles.safeArea}>
-        <StatusBar style="auto" />
+
 
         <View style={styles.resultContainer}>
           <View style={styles.logoContainer}>
@@ -269,7 +268,8 @@ export default function CreateRestaurantScreen() {
             variant="outline"
             onPress={goBackToForm}
             style={styles.resultButton}
-            textStyle={{ color: '#000' }}
+            textStyle={{ color: Colors.light.black }}
+
           />
           <View style={styles.logoContainer}>
             <StarIcon size={26} />
@@ -281,7 +281,7 @@ export default function CreateRestaurantScreen() {
 
   return (
     <ThemedView style={styles.safeArea}>
-      <StatusBar style="auto" />
+
       <KeyboardAvoidingView
         style={styles.keyboardAvoid}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -356,8 +356,8 @@ export default function CreateRestaurantScreen() {
               onChangeText={(t: string) => { setName(t); clearFieldError('name'); }}
               inputStyle={{
                 backgroundColor: 'transparent',
-                borderColor: '#000',
-                color: '#000',
+                borderColor: Colors.light.black,
+                color: Colors.light.black,
               }}
               placeholderTextColor={'#000'}
             />
@@ -434,14 +434,14 @@ export default function CreateRestaurantScreen() {
                 onChangeText={(t) => { setDescription(t); clearFieldError('description'); }}
                 inputStyle={{
                   backgroundColor: 'transparent',
-                  borderColor: '#000',
-                  color: '#000',
+                  borderColor: Colors.light.black,
+                  color: Colors.light.black,
                   textAlignVertical: 'top',
                   minHeight: 140,
                 }}
                 multiline
                 numberOfLines={4}
-                placeholderTextColor={'#000'}
+                placeholderTextColor={Colors.light.black}
               />
               {errors.description ? <Text style={styles.fieldError}>{errors.description}</Text> : null}
 
@@ -454,7 +454,7 @@ export default function CreateRestaurantScreen() {
                 loading={createMutation.isPending}
                 disabled={createMutation.isPending}
                 style={styles.submitButton}
-                textStyle={{ color: '#000' }}
+                textStyle={{ color: Colors.light.black }}
               />
             </View>
           </ThemedView>
@@ -483,8 +483,7 @@ const styles = StyleSheet.create({
     paddingBottom: 60,
   },
   container: {
-    padding: 20,
-    paddingBottom: 40,
+    padding: Space.md,
   },
   title: {
     fontSize: 28,
@@ -616,12 +615,11 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     marginTop: 30,
-    marginBottom: 20,
     backgroundColor: '#fff',
     color: '#000',
-    borderRadius: 25,
+    borderRadius: Space.lg,
     borderWidth: 1,
-    borderColor: '#000',
+    borderColor: Colors.light.black,
     paddingHorizontal: 20,
     paddingVertical: 10,
     fontSize: 16,
@@ -635,7 +633,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   resultTitle: {
-    color: '#264BEB',
+    color: Colors.light.tailorBlue,
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
