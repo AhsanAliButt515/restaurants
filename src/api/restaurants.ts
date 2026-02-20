@@ -83,7 +83,6 @@ async function fetchRestaurants(page = 1, limit = 10): Promise<RestaurantListRes
   const response = await api.get<RestaurantListResponse>('/restaurant/list', {
     params: { page, limit },
   });
-  console.log(response.data);
   return response.data;
 }
 

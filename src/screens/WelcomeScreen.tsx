@@ -1,10 +1,9 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Colors, CornorRadius, Space } from '@/constants/theme';
+import Logo from '@/utils/svgs';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-// import Logo from "../../assets/images/logo.svg";
-import Logo from '@/utils/svgs';
 import { Button } from '../components/ui/Button';
 
 export default function WelcomeScreen({ navigation }: any) {

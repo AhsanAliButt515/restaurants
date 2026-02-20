@@ -3,9 +3,9 @@ import { useDeleteRestaurantMutation, useRestaurantsQuery } from '@/api/restaura
 import { RestaurantCard } from '@/components/RestaurantCard';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Colors, Space } from '@/constants/theme';
+import { Colors, CornorRadius, Space } from '@/constants/theme';
 import { useFavorites } from '@/hooks/useFavorites';
-import { MapIcon, MapPinMarker } from '@/utils/svgs';
+import { MapIcon } from '@/utils/svgs';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import React, { useRef, useState } from 'react';
@@ -16,11 +16,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 const PAGE_SIZE = 10;
 const MAP_CARD_WIDTH = 260;
 const MAP_CARD_MARGIN = 10;
-
-// Custom marker colors (any hex works with MapPinMarker SVG)
-const MARKER_COLOR_SELECTED = Colors.light.tailorBlue;
-const MARKER_COLOR_UNSELECTED = '#8DA0F0';
-const MARKER_SIZE = 40;
 
 // Dark map style to match the app (background ~#1E242C)
 const DARK_MAP_STYLE = [
@@ -204,7 +199,6 @@ export default function RestaurantListScreen() {
               {restaurantList.map((restaurant: Restaurant) => {
                 if (!restaurant.latlng || restaurant.latlng.lat === undefined || restaurant.latlng.lng === undefined) return null;
                 const isSelected = selectedMarkerId === restaurant._id;
-                const markerColor = isSelected ? MARKER_COLOR_SELECTED : MARKER_COLOR_UNSELECTED;
                 return (
                   <Marker
                     key={`${restaurant._id}-${isSelected}`}
@@ -214,6 +208,15 @@ export default function RestaurantListScreen() {
                     }}
                     title={restaurant.name}
                     description={restaurant.address}
+                    
+                    // image={require('../../../assets/images/default.png')}
+                    image={
+                      
+                      isSelected
+                        ? require('../../../assets/images/selected.png')
+                        : require('../../../assets/images/default.png')
+                      
+                    }
                     anchor={{ x: 0.5, y: 1 }}
                     onPress={() => {
                       setSelectedMarkerId(restaurant._id);
@@ -225,9 +228,7 @@ export default function RestaurantListScreen() {
                         });
                       }
                     }}
-                  >
-                    <MapPinMarker color={markerColor} size={MARKER_SIZE} />
-                  </Marker>
+                  />
                 );
               })}
             </MapView>
@@ -323,7 +324,6 @@ const styles = StyleSheet.create({
   mapCardWrap: {
     // width: MAP_CARD_WIDTH,
     marginRight: MAP_CARD_MARGIN,
-    paddingVertical: 6,
   },
   header: {
     flexDirection: 'row',
@@ -373,9 +373,10 @@ const styles = StyleSheet.create({
     width: '100%',
     overflow: 'hidden',
     backgroundColor: Colors.light.white,
-    marginBottom: 10,
     minHeight: 300,
     position: 'relative',
+    borderTopLeftRadius: CornorRadius.CornorRadius,
+    borderTopRightRadius: CornorRadius.CornorRadius,
   },
   map: {
     ...StyleSheet.absoluteFillObject,
@@ -385,8 +386,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    paddingLeft: 4,
-    paddingBottom: 16,
+    paddingLeft: Space.s,
+    paddingBottom: Space.xxl,
     paddingTop: 12,
   },
   mapCardsScroll: {

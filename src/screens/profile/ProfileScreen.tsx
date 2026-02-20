@@ -55,7 +55,6 @@ export default function ProfileScreen() {
   useEffect(() => {
     const fetchUser = async () => {
       const user = await getUser();
-      console.log('user', user);
       if (user) {
         const userData = JSON.parse(user);
         setUsername(userData.name);

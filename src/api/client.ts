@@ -1,8 +1,7 @@
 import { getToken } from '@/storage/auth';
 import axios from 'axios';
 
-export const BASE_URL = process.env.BASE_URL || 'https://react-native-challenge-api.tailor-hub.com/api';
-
+export const BASE_URL = process.env.EXPO_PUBLIC_API_URL
 const api = axios.create({
   baseURL: BASE_URL,
 });

@@ -211,7 +211,7 @@ export default function CreateRestaurantScreen() {
   useEffect(() => {
     const testGoogleApi = async () => {
       try {
-        const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=Madrid&key=AIzaSyDJmyIuXn00Mc1xlF4eVBQcZ5OT-wAsux4`;
+        const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=Madrid&key=${process.env.EXPO_PUBLIC_API_KEY}`;
         const response = await fetch(url);
         const data = await response.json();
         console.log('--- Google API Diagnostic ---');

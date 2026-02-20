@@ -8,7 +8,6 @@ interface CustomStarRatingProps {
   size?: number;
   color?: string;
   emptyColor?: string;
-  /** When set, stars are tappable and this is called with 1..maxRating */
   onRatingChange?: (value: number) => void;
 }
 

@@ -26,9 +26,17 @@ npm install
 ### 2. Environment Configuration
 Create `.env` file in project root:
 ```env
-BASE_URL=http://localhost:3000
-GOOGLE_MAPS_API_KEY=your_google_maps_api_key_here
+You need a google api key to use the location feature in create restaurant page
+Check .env.example for required variables
 ```
+### 3. Deployed links for both 
+```bash
+android: https://expo.dev/preview/update?message=fix+design+issues+deployment+10&updateRuntimeVersion=1.0.0&createdAt=2026-02-20T12%3A26%3A00.878Z&slug=exp&projectId=a3e15141-51d1-4ea1-bdaf-5f5fbaffc8e0&group=a2a4477b-9080-4db1-a66b-856b0565ab58
+
+ios:https://expo.dev/preview/update?message=fix+design+issues+deployment+10&updateRuntimeVersion=1.0.0&createdAt=2026-02-20T12%3A30%3A37.788Z&slug=exp&projectId=a3e15141-51d1-4ea1-bdaf-5f5fbaffc8e0&group=00d15081-7943-4209-87cd-c68aeee96d46  (replace with actual link)
+```
+
+
 
 ### 3. Run Development Server
 ```bash
@@ -38,7 +46,8 @@ npx expo start
 ### 4. Test on Device
 - **Android**: Scan QR code with Expo Go app
 - **iOS**: Scan QR code with Camera app (iOS 13+)
-- **Web**: Open `http://localhost:8081` in browser
+
+**Note**: This is a native-only app and will not build or run on web. Only Android and iOS platforms are supported.
 
 ## Platform-Specific Setup
 
@@ -55,6 +64,12 @@ npx expo start
 4. Or connect physical iPhone via cable
 
 ## Common Issues & Solutions
+
+### Known Backend Issues
+The following are known backend API issues that may affect app functionality:
+- **Edit Restaurant API**: The edit restaurant endpoint is not working properly
+- **Comment Names**: User names are not showing on comments due to backend data structure
+- **Status Bar**: Status bar icons may not appear on some Android emulators
 
 ### Status Bar Not Visible
 If status bar icons don't appear:
@@ -87,9 +102,12 @@ npx expo build:ios
 src/
 ├── api/           # API endpoints and React Query hooks
 ├── components/     # Reusable UI components
+├── constants/      # App constants and themes
+├── hooks/         # Custom React hooks
 ├── navigation/     # Navigation configuration
 ├── screens/        # App screens
-└── storage/        # Local storage utilities
+├── storage/        # Local storage utilities
+└── utils/         # Utility functions and SVG icons
 
 app/
 ├── _layout.tsx    # Root layout with providers
@@ -112,12 +130,33 @@ npx expo build:ios --type archive
 2. Configure build profiles in `eas.json`
 3. Submit: `npx expo submit`
 
+## AI Tools Used
+
+This project was developed with assistance from AI tools to accelerate development and solve specific technical challenges:
+
+### Claude AI (Anthropic)
+- **Map Integration**: Implemented Google Maps integration with custom markers, map cards overlay, and marker selection synchronization
+- **Root Navigator Setup**: Properly configured AuthStack and AppStack navigation structure with authentication state management
+- **Context Handling**: Resolved authentication context issues and ensured proper state management across the app
+
+### ChatGPT (OpenAI)
+- **Bottom Tab Navigator**: Solved hidden tab issue in the bottom tab navigator, ensuring proper tab visibility and functionality
+
+These AI tools were used as development assistants to accelerate implementation and resolve specific technical challenges, with all code reviewed and integrated into the final application.
+
 ## Support
 For issues:
 1. Check [Expo documentation](https://docs.expo.dev/)
 2. Verify environment variables in `.env`
 3. Ensure all dependencies are installed
 4. Test on physical device if emulator fails
+
+### Backend Troubleshooting
+If experiencing issues with restaurant editing or missing comment names:
+1. Verify backend API endpoints are properly implemented
+2. Check API response structure matches expected format
+3. Ensure authentication headers are properly sent
+4. Test API endpoints directly (e.g., using Postman) to confirm functionality
 
 ## Version Information
 - React Native: 0.74.x (via Expo SDK 50+)

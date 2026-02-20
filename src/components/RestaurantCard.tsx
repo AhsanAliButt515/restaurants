@@ -135,8 +135,7 @@ const styles = StyleSheet.create({
   },
   cardMap: {
     // add internal padding so content doesn't touch the border (map variant)
-    borderRadius: 12,
-    height: 84,
+    borderRadius: 20,
     padding: Space.s,
   },
   cardContent: {

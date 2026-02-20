@@ -53,7 +53,6 @@ type FieldErrors = {
 export default function EditRestaurantScreen() {
   const route = useRoute();
   const id = (route.params as { id?: string })?.id ?? '';
-  console.log('id', id);
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const placesRef = useRef<any>(null);
@@ -173,7 +172,6 @@ export default function EditRestaurantScreen() {
     if (!id) return;
     if (!validate()) return;
     const imgVal = getImageValue();
-    console.log('id', id);
     updateMutation.mutate(
       {
         name: name.trim(),

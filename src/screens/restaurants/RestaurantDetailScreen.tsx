@@ -323,7 +323,6 @@ function EditReviewForm({
   const [ratingError, setRatingError] = useState<string | null>(null);
   const [commentError, setCommentError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  console.log('EditReviewForm render', { review, rating, comment });
   const handleUpdate = () => {
     setRatingError(null);
     setCommentError(null);

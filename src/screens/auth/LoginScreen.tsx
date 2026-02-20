@@ -86,7 +86,6 @@ export default function LoginScreen() {
                 return;
             }
             const response = await loginMutation.mutateAsync({ email, password });
-            console.log('Login Response:', response);
             if (response && response.user) {
                 // Store authentication data
                 await saveAccess("1")
