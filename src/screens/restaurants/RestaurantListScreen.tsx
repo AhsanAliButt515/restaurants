@@ -5,22 +5,22 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Colors, Space } from '@/constants/theme';
 import { useFavorites } from '@/hooks/useFavorites';
-import { MapIcon } from '@/utils/svgs';
+import { MapIcon, MapPinMarker } from '@/utils/svgs';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import React, { useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Animated, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { RectButton, Swipeable } from 'react-native-gesture-handler';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 const PAGE_SIZE = 10;
 const MAP_CARD_WIDTH = 260;
 const MAP_CARD_MARGIN = 10;
 
-// Exact pin colors: selected = #264BEB, unselected = #8DA0F0
-// Note: On Android the default pin uses only hue, so both may look similar blue.
-const PIN_COLOR_SELECTED = 'blue';
-const PIN_COLOR_UNSELECTED = 'lightblue';
+// Custom marker colors (any hex works with MapPinMarker SVG)
+const MARKER_COLOR_SELECTED = Colors.light.tailorBlue;
+const MARKER_COLOR_UNSELECTED = '#8DA0F0';
+const MARKER_SIZE = 40;
 
 // Dark map style to match the app (background ~#1E242C)
 const DARK_MAP_STYLE = [
@@ -204,6 +204,7 @@ export default function RestaurantListScreen() {
               {restaurantList.map((restaurant: Restaurant) => {
                 if (!restaurant.latlng || restaurant.latlng.lat === undefined || restaurant.latlng.lng === undefined) return null;
                 const isSelected = selectedMarkerId === restaurant._id;
+                const markerColor = isSelected ? MARKER_COLOR_SELECTED : MARKER_COLOR_UNSELECTED;
                 return (
                   <Marker
                     key={`${restaurant._id}-${isSelected}`}
@@ -213,7 +214,7 @@ export default function RestaurantListScreen() {
                     }}
                     title={restaurant.name}
                     description={restaurant.address}
-                    pinColor={isSelected ? PIN_COLOR_SELECTED : PIN_COLOR_UNSELECTED}
+                    anchor={{ x: 0.5, y: 1 }}
                     onPress={() => {
                       setSelectedMarkerId(restaurant._id);
                       const idx = restaurantList.findIndex((r) => r._id === restaurant._id);
@@ -224,7 +225,9 @@ export default function RestaurantListScreen() {
                         });
                       }
                     }}
-                  />
+                  >
+                    <MapPinMarker color={markerColor} size={MARKER_SIZE} />
+                  </Marker>
                 );
               })}
             </MapView>
